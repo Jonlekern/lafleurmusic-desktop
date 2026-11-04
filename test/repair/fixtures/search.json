@@ -1,0 +1,6 @@
+{"created":"2026-10-17T10:00:00.000Z","count":2,"offset":0,"releases":[
+ {"id":"rel-1","score":100,"title":"Night Drive","status":"Official","date":"2010-11-29","track-count":5,
+  "artist-credit":[{"name":"Kavinsky","artist":{"id":"art-1","name":"Kavinsky"}}]},
+ {"id":"rel-2","score":82,"title":"Night Drive (Remixes)","date":"2011","track-count":3,
+  "artist-credit":[{"name":"Kavinsky","artist":{"id":"art-1","name":"Kavinsky"}}]}
+]}

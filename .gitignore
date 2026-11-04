@@ -1,0 +1,25 @@
+# Flutter / Dart
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+*.iml
+.idea/
+.DS_Store
+
+# Generated platform files
+macos/Flutter/ephemeral/
+macos/Pods/
+windows/flutter/ephemeral/
+
+# Golden test failure output
+test/ui/failures/
+
+# Local only
+maquettes/
+
+# Third-party Winamp skins used only for local tests
+test/fixtures/skins-local/

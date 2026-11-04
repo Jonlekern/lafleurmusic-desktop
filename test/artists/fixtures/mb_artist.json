@@ -1,0 +1,5 @@
+{"id":"aaaa-1111","name":"Cage the Elephant","type":"Group",
+ "relations":[
+  {"type":"official homepage","url":{"resource":"https://cagetheelephant.com/"}},
+  {"type":"wikidata","url":{"resource":"https://www.wikidata.org/wiki/Q1025032"}}
+ ]}
