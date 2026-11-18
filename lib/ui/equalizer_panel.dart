@@ -91,10 +91,7 @@ class EqualizerPanel extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       _freq(Equalizer.bands[i]),
-                      style: const TextStyle(
-                        color: LafleurColors.sub,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: LafleurColors.sub, fontSize: 12),
                     ),
                   ],
                 ),
@@ -143,7 +140,7 @@ class _Band extends StatelessWidget {
             Container(
               width: 6,
               decoration: BoxDecoration(
-                color: const Color(0xFF333333),
+                color: LafleurColors.p.eqTrack,
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -151,7 +148,7 @@ class _Band extends StatelessWidget {
               width: 6,
               height: h * f,
               decoration: BoxDecoration(
-                color: active ? LafleurColors.pink : const Color(0xFF666666),
+                color: active ? LafleurColors.pink : LafleurColors.p.fainter,
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -160,10 +157,7 @@ class _Band extends StatelessWidget {
               child: Container(
                 width: 20,
                 height: 20,
-                decoration: const BoxDecoration(
-                  color: LafleurColors.text,
-                  shape: BoxShape.circle,
-                ),
+                decoration: knobDecoration(),
               ),
             ),
           ],

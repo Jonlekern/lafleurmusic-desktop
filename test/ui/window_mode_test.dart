@@ -5,7 +5,11 @@ import 'package:window_manager/window_manager.dart';
 
 /// Fenêtre macOS simulée : plein écran / agrandie comme le Mac de Johnny (1920×1080).
 class FakeWm implements WindowManager {
-  FakeWm({this.full = false, this.max = false, this.size = const Size(920, 690)});
+  FakeWm({
+    this.full = false,
+    this.max = false,
+    this.size = const Size(920, 690),
+  });
   bool full, max;
   Size size;
   final calls = <String>[];
@@ -38,7 +42,9 @@ class FakeWm implements WindowManager {
   @override
   Future<void> setSize(Size s, {bool animate = false}) async {
     // en plein écran, macOS ignore la nouvelle taille
-    calls.add('size ${s.width.round()}x${s.height.round()}${full ? ' (ignorée)' : ''}');
+    calls.add(
+      'size ${s.width.round()}x${s.height.round()}${full ? ' (ignorée)' : ''}',
+    );
     if (!full) size = s;
   }
 
@@ -54,34 +60,49 @@ void main() {
     final w = DesktopWindow(wm: wm);
     final previous = await w.enterWinamp(winamp);
     expect(wm.size, winamp);
-    expect(wm.calls.indexOf('fullscreen false'), lessThan(wm.calls.indexOf('size 550x696')));
+    expect(
+      wm.calls.indexOf('fullscreen false'),
+      lessThan(wm.calls.indexOf('size 550x696')),
+    );
     expect(previous, const Size(920, 690));
   });
 
-  test('plein écran : en quittant le skin, on retrouve le plein écran', () async {
-    final wm = FakeWm(full: true, size: const Size(1920, 1080));
-    final w = DesktopWindow(wm: wm);
-    final previous = await w.enterWinamp(winamp);
-    await w.leaveWinamp(previous);
-    expect(wm.full, true);
-    expect(wm.calls.last, 'fullscreen true');
-  });
+  test(
+    'plein écran : en quittant le skin, on retrouve le plein écran',
+    () async {
+      final wm = FakeWm(full: true, size: const Size(1920, 1080));
+      final w = DesktopWindow(wm: wm);
+      final previous = await w.enterWinamp(winamp);
+      await w.leaveWinamp(previous);
+      expect(wm.full, true);
+      expect(wm.calls.last, 'fullscreen true');
+    },
+  );
 
-  test('fenêtre agrandie : on la réduit avant, on la ré-agrandit après', () async {
-    final wm = FakeWm(max: true);
-    final w = DesktopWindow(wm: wm);
-    final previous = await w.enterWinamp(winamp);
-    expect(wm.calls.indexOf('unmaximize'), lessThan(wm.calls.indexOf('size 550x696')));
-    await w.leaveWinamp(previous);
-    expect(wm.calls.last, 'maximize');
-  });
+  test(
+    'fenêtre agrandie : on la réduit avant, on la ré-agrandit après',
+    () async {
+      final wm = FakeWm(max: true);
+      final w = DesktopWindow(wm: wm);
+      final previous = await w.enterWinamp(winamp);
+      expect(
+        wm.calls.indexOf('unmaximize'),
+        lessThan(wm.calls.indexOf('size 550x696')),
+      );
+      await w.leaveWinamp(previous);
+      expect(wm.calls.last, 'maximize');
+    },
+  );
 
   test('fenêtre normale : ni plein écran ni agrandissement touchés', () async {
     final wm = FakeWm();
     final w = DesktopWindow(wm: wm);
     final previous = await w.enterWinamp(winamp);
     await w.leaveWinamp(previous);
-    expect(wm.calls.where((c) => c.contains('full') || c.contains('max')), isEmpty);
+    expect(
+      wm.calls.where((c) => c.contains('full') || c.contains('max')),
+      isEmpty,
+    );
     expect(wm.size, const Size(920, 690));
   });
 }

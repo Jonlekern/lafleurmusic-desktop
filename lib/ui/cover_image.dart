@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../theme/widgets.dart';
+
 import '../app_scope.dart';
 
 /// Pochette d'un morceau (cache Covers), la fleur LAFLEUR en attendant ou s'il n'y en a pas.
@@ -21,12 +23,7 @@ class CoverImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final covers = AppScope.of(context).covers;
-    final fallback = Image.asset(
-      'assets/fleur-tile.png',
-      width: size,
-      height: size,
-      fit: BoxFit.cover,
-    );
+    final fallback = fleurTile(size);
     final path = trackPath;
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),

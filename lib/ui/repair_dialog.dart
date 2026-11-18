@@ -100,10 +100,10 @@ class _RepairDialogState extends State<RepairDialog> {
     final p = _proposal;
     final albumName = widget.tracks.first.album;
     return Dialog(
-      backgroundColor: const Color(0xFF181818),
+      backgroundColor: LafleurColors.p.sheet,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: Color(0xFF333333)),
+        side: BorderSide(color: LafleurColors.p.sheetLine),
       ),
       child: SizedBox(
         width: 1000,
@@ -115,7 +115,7 @@ class _RepairDialogState extends State<RepairDialog> {
             children: [
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.auto_fix_high_rounded,
                     size: 26,
                     color: LafleurColors.text,
@@ -136,7 +136,7 @@ class _RepairDialogState extends State<RepairDialog> {
               const SizedBox(height: 6),
               Text(
                 s.repairSource,
-                style: const TextStyle(color: LafleurColors.sub, fontSize: 14),
+                style: TextStyle(color: LafleurColors.sub, fontSize: 14),
               ),
               const SizedBox(height: 24),
               if (_busy)
@@ -145,7 +145,7 @@ class _RepairDialogState extends State<RepairDialog> {
                   child: Center(
                     child: Text(
                       s.searching,
-                      style: const TextStyle(color: LafleurColors.sub),
+                      style: TextStyle(color: LafleurColors.sub),
                     ),
                   ),
                 )
@@ -230,14 +230,14 @@ class _RepairDialogState extends State<RepairDialog> {
       final changed = after && before != afterV;
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 9),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFF222222))),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: LafleurColors.p.rowLine)),
         ),
         child: Row(
           children: [
             Text(
               name,
-              style: const TextStyle(color: LafleurColors.sub, fontSize: 14),
+              style: TextStyle(color: LafleurColors.sub, fontSize: 14),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -273,19 +273,19 @@ class _RepairDialogState extends State<RepairDialog> {
             width: 180,
             height: 180,
             decoration: BoxDecoration(
-              color: const Color(0xFF222222),
+              color: LafleurColors.p.rowLine,
               borderRadius: BorderRadius.circular(6),
             ),
             alignment: Alignment.center,
             child: Text(
               s.noCover,
-              style: const TextStyle(color: Color(0xFF555555), fontSize: 13),
+              style: TextStyle(color: LafleurColors.p.faintest, fontSize: 13),
             ),
           );
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF111111),
+        color: LafleurColors.p.well,
         border: Border.all(
           color: after ? LafleurColors.pink : LafleurColors.line,
         ),

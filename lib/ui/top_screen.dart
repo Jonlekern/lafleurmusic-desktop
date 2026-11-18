@@ -30,7 +30,7 @@ class TopScreen extends StatelessWidget {
             children: [
               Text(
                 s.topLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   color: LafleurColors.sub,
                   fontSize: 12,
                   letterSpacing: 1,
@@ -73,7 +73,7 @@ class TopScreen extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 s.playRule,
-                style: const TextStyle(color: LafleurColors.sub, fontSize: 13),
+                style: TextStyle(color: LafleurColors.sub, fontSize: 13),
               ),
               const SizedBox(height: 22),
               const _Line(head: true),
@@ -83,7 +83,7 @@ class TopScreen extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 30),
                         child: Text(
                           s.topEmpty,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: LafleurColors.sub,
                             fontSize: 15,
                           ),
@@ -197,7 +197,7 @@ class _Line extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: st(
-                  color: selected || head ? null : const Color(0xFFBBBBBB),
+                  color: selected || head ? null : LafleurColors.p.soft,
                 ),
               ),
             ),

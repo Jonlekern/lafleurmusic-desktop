@@ -29,10 +29,10 @@ Future<void> showTrackMenu(BuildContext context, Offset at, Track track) async {
   final a = await showMenu<_Action>(
     context: context,
     position: RelativeRect.fromLTRB(at.dx, at.dy, at.dx, at.dy),
-    color: const Color(0xFF232323),
+    color: LafleurColors.p.menu,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
-      side: const BorderSide(color: Color(0xFF3A3A3A)),
+      side: BorderSide(color: LafleurColors.p.menuLine),
     ),
     items: [
       _item(_Action.playNext, s.playNextAction),
@@ -72,7 +72,7 @@ Future<void> showTracksMenu(
   final a = await showMenu<_Action>(
     context: context,
     position: RelativeRect.fromLTRB(at.dx, at.dy, at.dx, at.dy),
-    color: const Color(0xFF232323),
+    color: LafleurColors.p.menu,
     items: [
       _item(_Action.playNext, s.playNextAction),
       _item(_Action.enqueue, s.addToQueue),

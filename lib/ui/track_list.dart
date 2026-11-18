@@ -55,9 +55,9 @@ class TrackList extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
-                          color: Colors.black,
+                          color: LafleurColors.p.shadow,
                           blurRadius: 40,
                           offset: Offset(0, 12),
                         ),
@@ -92,7 +92,7 @@ class TrackList extends StatelessWidget {
                       children: [
                         Text(
                           label ?? s.playlistLabel,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: LafleurColors.sub,
                             fontSize: 12,
                             letterSpacing: 1,
@@ -113,7 +113,7 @@ class TrackList extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           '${s.nSongs(tracks.length)} · ${s.minutes(minutes)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: LafleurColors.sub,
                             fontSize: 14,
                           ),
@@ -276,7 +276,7 @@ Future<void> writeEdits(BuildContext context, List<TagEdit> edits) async {
         backgroundColor: LafleurColors.bar,
         content: Text(
           app.strings.cannotWrite(r.failedPath ?? ''),
-          style: const TextStyle(color: LafleurColors.text),
+          style: TextStyle(color: LafleurColors.text),
         ),
       ),
     );
@@ -361,11 +361,11 @@ class _RowState extends State<_Row> {
             controller: _ctrl,
             focusNode: node,
             style: style.copyWith(color: LafleurColors.text),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               isDense: true,
               border: InputBorder.none,
               filled: true,
-              fillColor: Color(0xFF2A2A2A),
+              fillColor: LafleurColors.p.field,
             ),
             onSubmitted: (_) => _commit(),
           ),
@@ -383,7 +383,7 @@ class _RowState extends State<_Row> {
     final w = widget;
     final fg = w.selected
         ? LafleurColors.ink
-        : (w.head ? LafleurColors.sub : const Color(0xFFDDDDDD));
+        : (w.head ? LafleurColors.sub : LafleurColors.p.rowText);
     TextStyle st(bool bold) => TextStyle(
       color: fg,
       fontSize: w.head ? 12 : 14,
@@ -402,7 +402,7 @@ class _RowState extends State<_Row> {
             color: w.selected ? LafleurColors.pink : null,
             borderRadius: w.head ? null : BorderRadius.circular(8),
             border: w.head
-                ? const Border(bottom: BorderSide(color: LafleurColors.line))
+                ? Border(bottom: BorderSide(color: LafleurColors.line))
                 : null,
           ),
           child: Row(
@@ -473,11 +473,11 @@ class _EditableTitleState extends State<EditableTitle> {
             controller: _ctrl,
             focusNode: node,
             style: _style,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               isDense: true,
               border: InputBorder.none,
               filled: true,
-              fillColor: Color(0xFF2A2A2A),
+              fillColor: LafleurColors.p.field,
             ),
             onSubmitted: (v) {
               setState(() => _editing = false);
@@ -526,12 +526,12 @@ class DragGhost extends StatelessWidget {
         width: 520,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A2A2A),
+          color: LafleurColors.p.field,
           border: Border.all(color: LafleurColors.pink),
           borderRadius: BorderRadius.circular(8),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black,
+              color: LafleurColors.p.shadow,
               blurRadius: 30,
               offset: Offset(0, 10),
             ),
@@ -540,7 +540,7 @@ class DragGhost extends StatelessWidget {
         child: Text(
           '${track.title}   ${track.artist}',
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 14,
             color: LafleurColors.text,

@@ -137,7 +137,7 @@ class _TrackEditDialogState extends State<TrackEditDialog> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: LafleurColors.sub,
             fontSize: 11,
             letterSpacing: 1,
@@ -161,7 +161,7 @@ class _TrackEditDialogState extends State<TrackEditDialog> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF444444)),
+              borderSide: BorderSide(color: LafleurColors.p.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -189,8 +189,8 @@ class _TrackEditDialogState extends State<TrackEditDialog> {
                 TextSpan(text: s.newFile('')),
                 TextSpan(
                   text: widget.fileName,
-                  style: const TextStyle(
-                    color: Color(0xFFEEEEEE),
+                  style: TextStyle(
+                    color: LafleurColors.p.strong,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

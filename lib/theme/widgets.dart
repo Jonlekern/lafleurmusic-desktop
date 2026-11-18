@@ -28,7 +28,7 @@ class PillButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             color: primary ? LafleurColors.pink : null,
-            border: primary ? null : Border.all(color: const Color(0xFF444444)),
+            border: primary ? null : Border.all(color: LafleurColors.p.outline),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -96,7 +96,7 @@ class TitleBar extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     height: 52,
     width: double.infinity,
-    decoration: const BoxDecoration(
+    decoration: BoxDecoration(
       color: LafleurColors.bar,
       border: Border(bottom: BorderSide(color: LafleurColors.line)),
     ),
@@ -104,7 +104,14 @@ class TitleBar extends StatelessWidget {
     child: Stack(
       alignment: Alignment.center,
       children: [
-        Image.asset('assets/logo-texte-grand.png', height: 20),
+        Image.asset(
+          'assets/logo-texte-grand.png',
+          height: 20,
+          // logo blanc la nuit, noir le jour
+          color: LafleurColors.p.brightness == Brightness.light
+              ? LafleurColors.text
+              : null,
+        ),
         if (trailing != null)
           Align(alignment: Alignment.centerRight, child: trailing),
       ],
@@ -173,4 +180,30 @@ class _FocusOnShowState extends State<FocusOnShow> {
 
   @override
   Widget build(BuildContext context) => widget.builder(_node);
+}
+
+/// Pochette absente : fleur rose sur carré sombre la nuit, sur carré beige le jour (maquette iPhone).
+Widget fleurTile(double size) => LafleurColors.p.brightness == Brightness.light
+    ? Container(
+        width: size,
+        height: size,
+        color: const Color(0xFFEDE8DE),
+        alignment: Alignment.center,
+        child: Image.asset('assets/fleur.png', width: size * 0.62),
+      )
+    : Image.asset(
+        'assets/fleur-tile.png',
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+      );
+
+/// Bouton rond d'un curseur : blanc, avec un fin contour gris le jour (sinon invisible sur le blanc).
+BoxDecoration knobDecoration() {
+  final edge = LafleurColors.p.knobEdge;
+  return BoxDecoration(
+    color: const Color(0xFFFFFFFF),
+    shape: BoxShape.circle,
+    border: edge == null ? null : Border.all(color: edge),
+  );
 }

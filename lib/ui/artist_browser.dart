@@ -98,7 +98,7 @@ class ArtistBrowser extends StatelessWidget {
 }
 
 const _name = TextStyle(fontWeight: FontWeight.w700, fontSize: 15);
-const _count = TextStyle(color: LafleurColors.sub, fontSize: 13);
+TextStyle get _count => TextStyle(color: LafleurColors.sub, fontSize: 13);
 
 class _Cell extends StatelessWidget {
   const _Cell({required this.name, required this.count, required this.onTap});
@@ -193,7 +193,7 @@ class _Toggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
-      border: Border.all(color: const Color(0xFF444444)),
+      border: Border.all(color: LafleurColors.p.outline),
       borderRadius: BorderRadius.circular(20),
     ),
     clipBehavior: Clip.antiAlias,

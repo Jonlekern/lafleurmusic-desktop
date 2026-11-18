@@ -12,14 +12,14 @@ class NowPanel extends StatelessWidget {
   const NowPanel({super.key, this.extra});
   final Widget? extra; // sous « À suivre » (ex. résumé de l'artiste affiché)
 
-  static const head = TextStyle(
+  static TextStyle get head => TextStyle(
     color: LafleurColors.sub,
     fontSize: 11,
     letterSpacing: 0.9,
     fontWeight: FontWeight.w700,
   );
-  static const _section = TextStyle(
-    color: Color(0xFF777777),
+  static TextStyle get _section => TextStyle(
+    color: LafleurColors.p.faint,
     fontSize: 10,
     letterSpacing: 0.9,
     fontWeight: FontWeight.w700,
@@ -32,7 +32,7 @@ class NowPanel extends StatelessWidget {
     return Container(
       width: 300,
       alignment: Alignment.topCenter, // toute la hauteur, contenu en haut
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: LafleurColors.panel,
         border: Border(left: BorderSide(color: LafleurColors.line)),
       ),
@@ -75,10 +75,7 @@ class NowPanel extends StatelessWidget {
                         : '${t.artist.isEmpty ? s.unknownArtist : t.artist} · ${t.album}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: LafleurColors.sub,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: LafleurColors.sub, fontSize: 13),
                   ),
                   const SizedBox(height: 24),
                   if (q != null && (added > 0 || next.isNotEmpty))
@@ -159,12 +156,12 @@ class _UpNextRow extends StatelessWidget {
                 ),
               ),
             ),
-            child: const MouseRegion(
+            child: MouseRegion(
               cursor: SystemMouseCursors.grab,
               child: Icon(
                 Icons.drag_indicator_rounded,
                 size: 16,
-                color: Color(0xFF666666),
+                color: LafleurColors.p.fainter,
               ),
             ),
           ),
@@ -189,10 +186,7 @@ class _UpNextRow extends StatelessWidget {
                   track.artist.isEmpty ? s.unknownArtist : track.artist,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: LafleurColors.sub,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: LafleurColors.sub, fontSize: 12),
                 ),
               ],
             ),
@@ -201,7 +195,7 @@ class _UpNextRow extends StatelessWidget {
             key: Key('upnext-remove-$index'),
             onPressed: () => app.player.removeAt(index),
             icon: const Icon(Icons.close_rounded, size: 16),
-            color: const Color(0xFF777777),
+            color: LafleurColors.p.faint,
             visualDensity: VisualDensity.compact,
           ),
         ],

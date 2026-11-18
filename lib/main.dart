@@ -30,6 +30,7 @@ import 'player/player.dart';
 import 'settings.dart';
 import 'tags/tag_reader.dart';
 import 'tags/tag_writer.dart';
+import 'theme/colors.dart';
 import 'theme/lafleur_theme.dart';
 import 'skins/skins_folder.dart';
 import 'ui/library_screen.dart';
@@ -287,27 +288,30 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
     ops: Platform.isMacOS
         ? TrackOps(widget.db, _writer, MacTrash(), widget.player)
         : null,
-    child: MaterialApp(
-      navigatorKey: _nav,
-      // un .wsz glissé n'importe où sur la fenêtre va dans le dossier Skins
-      builder: (context, child) => DropTarget(
-        onDragDone: (d) =>
-            addDroppedSkins(context, [for (final f in d.files) f.path]),
-        child: child ?? const SizedBox.shrink(),
-      ),
-      title: 'LAFLEURMUSIC',
-      debugShowCheckedModeBanner: false,
-      theme: lafleurTheme(),
-      home: switch (_hasFolders) {
-        null => const Scaffold(),
-        false => WelcomeScreen(
-          strings: widget.strings,
-          onFolder: _addFolder,
-          progress: _firstScan,
-          emptyFolder: _emptyFolder,
+    // jour / nuit : suit le réglage clair / sombre du Mac
+    child: FollowSystemPalette(
+      builder: (_) => MaterialApp(
+        navigatorKey: _nav,
+        // un .wsz glissé n'importe où sur la fenêtre va dans le dossier Skins
+        builder: (context, child) => DropTarget(
+          onDragDone: (d) =>
+              addDroppedSkins(context, [for (final f in d.files) f.path]),
+          child: child ?? const SizedBox.shrink(),
         ),
-        true => const LibraryScreen(),
-      },
+        title: 'LAFLEURMUSIC',
+        debugShowCheckedModeBanner: false,
+        theme: lafleurTheme(LafleurPalette.current),
+        home: switch (_hasFolders) {
+          null => const Scaffold(),
+          false => WelcomeScreen(
+            strings: widget.strings,
+            onFolder: _addFolder,
+            progress: _firstScan,
+            emptyFolder: _emptyFolder,
+          ),
+          true => const LibraryScreen(),
+        },
+      ),
     ),
   );
 }

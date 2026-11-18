@@ -182,8 +182,8 @@ class _CoverflowScreenState extends State<CoverflowScreen>
                   right: 30,
                   child: Text(
                     s.escToQuit,
-                    style: const TextStyle(
-                      color: LafleurColors.sub,
+                    style: TextStyle(
+                      color: LafleurPalette.night.sub,
                       fontSize: 13,
                     ),
                   ),
@@ -218,8 +218,8 @@ class _CoverflowScreenState extends State<CoverflowScreen>
                         const SizedBox(height: 8),
                         Text(
                           s.playlistN(album.trackCount),
-                          style: const TextStyle(
-                            color: LafleurColors.sub,
+                          style: TextStyle(
+                            color: LafleurPalette.night.sub,
                             fontSize: 17,
                           ),
                         ),

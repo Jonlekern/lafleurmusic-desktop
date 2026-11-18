@@ -20,11 +20,8 @@ class DialogFrame extends StatelessWidget {
   final double width;
   final Color confirmColor;
 
-  static const body = TextStyle(
-    color: Color(0xFFBBBBBB),
-    fontSize: 14,
-    height: 1.5,
-  );
+  static TextStyle get body =>
+      TextStyle(color: LafleurColors.p.soft, fontSize: 14, height: 1.5);
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +29,10 @@ class DialogFrame extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
     );
     return Dialog(
-      backgroundColor: const Color(0xFF1F1F1F),
+      backgroundColor: LafleurColors.p.dialog,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: Color(0xFF3A3A3A)),
+        side: BorderSide(color: LafleurColors.p.menuLine),
       ),
       child: SizedBox(
         width: width,
@@ -62,7 +59,7 @@ class DialogFrame extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       shape: pill,
                       foregroundColor: LafleurColors.text,
-                      side: const BorderSide(color: Color(0xFF444444)),
+                      side: BorderSide(color: LafleurColors.p.outline),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 22,
                         vertical: 14,
@@ -115,8 +112,8 @@ class NoteBox extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
     ),
     child: DefaultTextStyle.merge(
-      style: const TextStyle(
-        color: Color(0xFFCCCCCC),
+      style: TextStyle(
+        color: LafleurColors.p.softer,
         fontSize: 13,
         height: 1.8,
       ),

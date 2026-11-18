@@ -40,7 +40,7 @@ class _ArtistSummaryState extends State<ArtistSummary> {
         return Container(
           margin: const EdgeInsets.only(top: 18),
           padding: const EdgeInsets.only(top: 22),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             border: Border(top: BorderSide(color: LafleurColors.line)),
           ),
           child: Column(
@@ -48,7 +48,7 @@ class _ArtistSummaryState extends State<ArtistSummary> {
             children: [
               Text(
                 s.theArtist,
-                style: const TextStyle(
+                style: TextStyle(
                   color: LafleurColors.sub,
                   fontSize: 11,
                   letterSpacing: 0.9,
@@ -77,7 +77,7 @@ class _ArtistSummaryState extends State<ArtistSummary> {
                           const SizedBox(height: 2),
                           Text(
                             line,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: LafleurColors.sub,
                               fontSize: 13,
                             ),
@@ -93,10 +93,10 @@ class _ArtistSummaryState extends State<ArtistSummary> {
                 text,
                 maxLines: _open ? null : 6,
                 overflow: _open ? null : TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   height: 1.55,
-                  color: Color(0xFFCFCFCF),
+                  color: LafleurColors.p.body,
                 ),
               ),
               const SizedBox(height: 10),
@@ -118,10 +118,7 @@ class _ArtistSummaryState extends State<ArtistSummary> {
                     : () => launchUrl(Uri.parse(info.pageUrl!)),
                 child: Text(
                   s.wikiSource,
-                  style: const TextStyle(
-                    color: Color(0xFF777777),
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: LafleurColors.p.faint, fontSize: 11),
                 ),
               ),
               const SizedBox(height: 20),

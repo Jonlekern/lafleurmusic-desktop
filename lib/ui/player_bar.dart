@@ -30,7 +30,7 @@ class _PlayerBarState extends State<PlayerBar> {
     final s = app.strings;
     return Container(
       height: 84,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: LafleurColors.bar,
         border: Border(top: BorderSide(color: LafleurColors.line)),
       ),
@@ -82,7 +82,7 @@ class _PlayerBarState extends State<PlayerBar> {
                                       : t.artist),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: LafleurColors.sub,
                               fontSize: 13,
                             ),
@@ -118,8 +118,8 @@ class _PlayerBarState extends State<PlayerBar> {
                             child: Container(
                               width: 40,
                               height: 40,
-                              decoration: const BoxDecoration(
-                                color: LafleurColors.text,
+                              decoration: BoxDecoration(
+                                color: LafleurColors.p.play,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
@@ -148,7 +148,7 @@ class _PlayerBarState extends State<PlayerBar> {
                         children: [
                           Text(
                             clock(st.position),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: LafleurColors.sub,
                               fontSize: 12,
                             ),
@@ -176,7 +176,7 @@ class _PlayerBarState extends State<PlayerBar> {
                                       Container(
                                         height: 5,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF3D3D3D),
+                                          color: LafleurColors.p.track,
                                           borderRadius: BorderRadius.circular(
                                             3,
                                           ),
@@ -200,10 +200,7 @@ class _PlayerBarState extends State<PlayerBar> {
                                         child: Container(
                                           width: 13,
                                           height: 13,
-                                          decoration: const BoxDecoration(
-                                            color: LafleurColors.text,
-                                            shape: BoxShape.circle,
-                                          ),
+                                          decoration: knobDecoration(),
                                         ),
                                       ),
                                     ],
@@ -215,7 +212,7 @@ class _PlayerBarState extends State<PlayerBar> {
                           const SizedBox(width: 10),
                           Text(
                             '-${clock(st.duration - st.position)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: LafleurColors.sub,
                               fontSize: 12,
                             ),
@@ -263,7 +260,7 @@ class _PlayerBarState extends State<PlayerBar> {
                       onPressed: () => openCoverflow(context),
                     ),
                     const SizedBox(width: 12),
-                    const Icon(
+                    Icon(
                       Icons.volume_up_rounded,
                       size: 18,
                       color: LafleurColors.sub,
@@ -284,7 +281,7 @@ class _PlayerBarState extends State<PlayerBar> {
                           value: _volume,
                           max: 100,
                           activeColor: LafleurColors.text,
-                          inactiveColor: const Color(0xFF3D3D3D),
+                          inactiveColor: LafleurColors.p.track,
                           onChanged: (v) {
                             setState(() => _volume = v);
                             app.player.setVolume(v);

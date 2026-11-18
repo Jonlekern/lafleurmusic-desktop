@@ -90,7 +90,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             const SizedBox(height: 12),
                             Text(
                               s.organizesAlone,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 17,
                                 color: LafleurColors.sub,
                               ),
@@ -100,7 +100,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               painter: DashedBorderPainter(
                                 color: _hover
                                     ? LafleurColors.pink
-                                    : const Color(0xFF555555),
+                                    : LafleurColors.p.faintest,
                               ),
                               child: SizedBox(
                                 width: 640,
@@ -113,7 +113,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                       size: 46,
                                       color: _hover
                                           ? LafleurColors.pink
-                                          : const Color(0xFFB0B0B0),
+                                          : LafleurColors.p.icon,
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
@@ -129,7 +129,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                     if (progress == null)
                                       Text(
                                         s.folderOrNas,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 14,
                                           color: LafleurColors.sub,
                                         ),
@@ -173,7 +173,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             Text(
                               s.nasHint,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 color: LafleurColors.sub,
                               ),

@@ -40,7 +40,7 @@ class Sidebar extends StatelessWidget {
     final s = app.strings;
     return Container(
       width: 240,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: LafleurColors.panel,
         border: Border(right: BorderSide(color: LafleurColors.line)),
       ),
@@ -132,7 +132,7 @@ class Sidebar extends StatelessWidget {
                         isDense: true,
                         hintText: s.newPlaylist,
                         filled: true,
-                        fillColor: const Color(0xFF2A2A2A),
+                        fillColor: LafleurColors.p.field,
                         border: InputBorder.none,
                       ),
                       onSubmitted: (v) => onCreate?.call(v.trim()),
@@ -197,7 +197,7 @@ class _Head extends StatelessWidget {
     padding: const EdgeInsets.fromLTRB(10, 14, 10, 8),
     child: Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         color: LafleurColors.sub,
         fontSize: 11,
         letterSpacing: 0.9,

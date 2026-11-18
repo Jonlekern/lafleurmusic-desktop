@@ -12,6 +12,7 @@ import 'package:lafleurmusic/library/db.dart';
 import 'package:lafleurmusic/library/models.dart';
 import 'package:lafleurmusic/player/player.dart';
 import 'package:lafleurmusic/tags/tag_writer.dart';
+import 'package:lafleurmusic/theme/colors.dart';
 import 'package:lafleurmusic/theme/lafleur_theme.dart';
 import 'package:lafleurmusic/ui/library_screen.dart';
 import 'package:lafleurmusic/ui/track_list.dart';
@@ -105,7 +106,10 @@ Future<(LibraryDb, FakePlayer)> pump(
       player: player,
       covers: covers,
       strings: Strings.of(const Locale('fr')),
-      child: MaterialApp(theme: lafleurTheme(), home: const LibraryScreen()),
+      child: MaterialApp(
+        theme: lafleurTheme(LafleurPalette.current),
+        home: const LibraryScreen(),
+      ),
     ),
   );
   for (var i = 0; i < 5; i++) {
@@ -214,6 +218,33 @@ void main() {
     await expectLater(
       find.byType(LibraryScreen),
       matchesGoldenFile('goldens/2-colonnes.png'),
+    );
+  });
+
+  testWidgets('mode jour : vue en colonnes comme la maquette du Mac en jour', (
+    tester,
+  ) async {
+    LafleurPalette.current = LafleurPalette.day;
+    addTearDown(() => LafleurPalette.current = LafleurPalette.night);
+    final (_, player) = await pump(tester, demo);
+    player.queue = null;
+    await player.playTracks(demo, 1);
+    player.show(
+      PlayerState(
+        track: demo[1],
+        position: const Duration(seconds: 93),
+        duration: const Duration(seconds: 245),
+        playing: true,
+      ),
+    );
+    await tester.pump();
+    await precacheAssets(tester, [
+      'assets/fleur.png',
+      'assets/logo-texte-grand.png',
+    ]);
+    await expectLater(
+      find.byType(LibraryScreen),
+      matchesGoldenFile('goldens/2-colonnes-jour.png'),
     );
   });
 

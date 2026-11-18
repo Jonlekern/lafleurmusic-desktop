@@ -53,7 +53,7 @@ class NameList extends StatelessWidget {
                         ),
                         Text(
                           '${list[i].$2}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: LafleurColors.sub,
                             fontSize: 14,
                           ),

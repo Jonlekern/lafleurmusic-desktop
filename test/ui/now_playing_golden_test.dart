@@ -11,6 +11,7 @@ import 'package:lafleurmusic/library/db.dart';
 import 'package:lafleurmusic/library/models.dart';
 import 'package:lafleurmusic/player/equalizer.dart';
 import 'package:lafleurmusic/player/player.dart';
+import 'package:lafleurmusic/theme/colors.dart';
 import 'package:lafleurmusic/theme/lafleur_theme.dart';
 import 'package:lafleurmusic/ui/now_playing_screen.dart';
 
@@ -21,67 +22,75 @@ void main() {
   setUpAll(loadFonts);
 
   testWidgets('En cours + égaliseur comme la maquette 4', (tester) async {
-    desktopSize(tester);
-    final db = LibraryDb(
-      DatabaseConnection(
-        NativeDatabase.memory(),
-        closeStreamsSynchronously: true,
-      ),
-    );
-    addTearDown(() async {
-      await tester.pumpWidget(const SizedBox());
-      await tester.runAsync(db.close);
-    });
-    final tracks = [
-      for (var i = 1; i <= 9; i++)
-        Track(
-          path: '/m/$i.flac',
-          folderId: 1,
-          title: i == 2 ? 'Lafleur Surf' : 'T$i',
-          artist: 'LAFLEURSTUDIO',
-          album: 'Studio Lafleur',
-          trackNo: i,
-          durationMs: 245000,
-          hasCover: true,
-          mtime: 1,
-          size: 1,
-        ),
-    ];
-    final player = FakePlayer();
-    await player.playTracks(tracks, 1);
-    player.current = PlayerState(
-      track: tracks[1],
-      position: const Duration(seconds: 93),
-      duration: const Duration(seconds: 245),
-      playing: true,
-    );
-    final eq = ValueNotifier(Equalizer.named('bass').copyWith(enabled: true));
-    await tester.pumpWidget(
-      AppScope(
-        db: db,
-        player: player,
-        equalizer: eq,
-        covers: Covers(
-          cacheDir: Directory.systemTemp.createTempSync('np'),
-          embedded: (_) async => null,
-        ),
-        strings: Strings.of(const Locale('fr')),
-        child: MaterialApp(
-          theme: lafleurTheme(),
-          home: const NowPlayingScreen(),
-        ),
-      ),
-    );
-    await tester.pump();
-    await precacheAssets(tester, [
-      'assets/fleur-tile.png',
-      'assets/logo-texte-grand.png',
-    ]);
-    expect(find.text('2 sur 9 · Studio Lafleur'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-    await expectLater(
-      find.byType(NowPlayingScreen),
-      matchesGoldenFile('goldens/4-en-cours-egaliseur.png'),
-    );
+    await _nowPlaying(tester, 'goldens/4-en-cours-egaliseur.png');
   });
+
+  testWidgets('mode jour : En cours + égaliseur', (tester) async {
+    LafleurPalette.current = LafleurPalette.day;
+    addTearDown(() => LafleurPalette.current = LafleurPalette.night);
+    await _nowPlaying(tester, 'goldens/4-en-cours-egaliseur-jour.png');
+  });
+}
+
+Future<void> _nowPlaying(WidgetTester tester, String golden) async {
+  desktopSize(tester);
+  final db = LibraryDb(
+    DatabaseConnection(
+      NativeDatabase.memory(),
+      closeStreamsSynchronously: true,
+    ),
+  );
+  addTearDown(() async {
+    await tester.pumpWidget(const SizedBox());
+    await tester.runAsync(db.close);
+  });
+  final tracks = [
+    for (var i = 1; i <= 9; i++)
+      Track(
+        path: '/m/$i.flac',
+        folderId: 1,
+        title: i == 2 ? 'Lafleur Surf' : 'T$i',
+        artist: 'LAFLEURSTUDIO',
+        album: 'Studio Lafleur',
+        trackNo: i,
+        durationMs: 245000,
+        hasCover: true,
+        mtime: 1,
+        size: 1,
+      ),
+  ];
+  final player = FakePlayer();
+  await player.playTracks(tracks, 1);
+  player.current = PlayerState(
+    track: tracks[1],
+    position: const Duration(seconds: 93),
+    duration: const Duration(seconds: 245),
+    playing: true,
+  );
+  final eq = ValueNotifier(Equalizer.named('bass').copyWith(enabled: true));
+  await tester.pumpWidget(
+    AppScope(
+      db: db,
+      player: player,
+      equalizer: eq,
+      covers: Covers(
+        cacheDir: Directory.systemTemp.createTempSync('np'),
+        embedded: (_) async => null,
+      ),
+      strings: Strings.of(const Locale('fr')),
+      child: MaterialApp(
+        theme: lafleurTheme(LafleurPalette.current),
+        home: const NowPlayingScreen(),
+      ),
+    ),
+  );
+  await tester.pump();
+  await precacheAssets(tester, [
+    'assets/fleur-tile.png',
+    'assets/fleur.png',
+    'assets/logo-texte-grand.png',
+  ]);
+  expect(find.text('2 sur 9 · Studio Lafleur'), findsOneWidget);
+  expect(tester.takeException(), isNull);
+  await expectLater(find.byType(NowPlayingScreen), matchesGoldenFile(golden));
 }

@@ -7,7 +7,7 @@ void showMessage(BuildContext context, String text) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       backgroundColor: LafleurColors.bar,
-      content: Text(text, style: const TextStyle(color: LafleurColors.text)),
+      content: Text(text, style: TextStyle(color: LafleurColors.text)),
     ),
   );
 }

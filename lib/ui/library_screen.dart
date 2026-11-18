@@ -48,7 +48,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
           backgroundColor: LafleurColors.bar,
           content: Text(
             '${app.strings.fr ? 'Illisible, passé' : 'Unreadable, skipped'} : ${p.basename(path)}',
-            style: const TextStyle(color: LafleurColors.text),
+            style: TextStyle(color: LafleurColors.text),
           ),
         ),
       );
@@ -178,26 +178,26 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   onSubmitted: (_) => _keys.requestFocus(),
                   decoration: InputDecoration(
                     hintText: s.search,
-                    hintStyle: const TextStyle(
+                    hintStyle: TextStyle(
                       color: LafleurColors.sub,
                       fontSize: 13,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search_rounded,
                       size: 16,
                       color: LafleurColors.sub,
                     ),
                     isDense: true,
                     filled: true,
-                    fillColor: const Color(0xFF0F0F0F),
+                    fillColor: LafleurColors.p.search,
                     contentPadding: EdgeInsets.zero,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: LafleurColors.line),
+                      borderSide: BorderSide(color: LafleurColors.line),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: LafleurColors.line),
+                      borderSide: BorderSide(color: LafleurColors.line),
                     ),
                   ),
                 ),
@@ -208,7 +208,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
               builder: (_, snap) => snap.data == true
                   ? Container(
                       width: double.infinity,
-                      color: const Color(0xFF2A1A2A),
+                      color: LafleurColors.p.warn,
                       padding: const EdgeInsets.symmetric(
                         vertical: 8,
                         horizontal: 18,

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../theme/widgets.dart';
+
 import '../app_scope.dart';
 import '../artists/artist_store.dart';
 
@@ -46,12 +48,7 @@ class _ArtistAvatarState extends State<ArtistAvatar> {
 
   @override
   Widget build(BuildContext context) {
-    final fallback = Image.asset(
-      'assets/fleur-tile.png',
-      width: widget.size,
-      height: widget.size,
-      fit: BoxFit.cover,
-    );
+    final fallback = fleurTile(widget.size);
     return ClipOval(
       child: SizedBox(
         width: widget.size,
