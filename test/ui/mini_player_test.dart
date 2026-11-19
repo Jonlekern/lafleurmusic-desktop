@@ -361,4 +361,47 @@ void main() {
       );
     });
   }
+
+  testWidgets('sous 300 de large : juste le rond rose', (tester) async {
+    await pump(
+      tester,
+      size: const Size(150, 130),
+      track: _track('Lafleur Surf'),
+    );
+    expect(find.byKey(const Key('playpause')), findsOneWidget);
+    expect(find.byKey(const Key('progress')), findsNothing);
+    expect(find.byType(Slider), findsNothing);
+    expect(find.textContaining('Lafleur Surf'), findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.byKey(const Key('playpause')));
+    expect(player.calls, ['toggle']);
+  });
+
+  testWidgets('bande la plus étroite (300) : rien ne déborde', (tester) async {
+    await pump(
+      tester,
+      size: const Size(300, 130),
+      track: _track('Lafleur Surf'),
+    );
+    expect(find.byKey(const Key('progress')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final day in [false, true]) {
+    testWidgets('image : rond rose ${day ? 'jour' : 'nuit'}', (tester) async {
+      if (day) {
+        LafleurPalette.current = LafleurPalette.day;
+        addTearDown(() => LafleurPalette.current = LafleurPalette.night);
+      }
+      await pump(
+        tester,
+        size: const Size(150, 130),
+        track: _track('Lafleur Surf'),
+      );
+      await expectLater(
+        find.byType(MiniPlayer),
+        matchesGoldenFile('goldens/10-rond${day ? '-jour' : ''}.png'),
+      );
+    });
+  }
 }

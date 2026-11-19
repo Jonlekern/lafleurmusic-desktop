@@ -61,6 +61,31 @@ class _MiniPlayerState extends State<MiniPlayer> {
             builder: (context, snap) {
               final st = snap.data ?? const PlayerState();
               final t = st.track;
+              // pour rire : plus étroit que 300, il ne reste que le rond rose
+              if (MediaQuery.sizeOf(context).width < kMiniButtonBelow) {
+                return Center(
+                  child: InkWell(
+                    key: const Key('playpause'),
+                    onTap: () => playOrShuffle(AppScope.of(context)),
+                    customBorder: const CircleBorder(),
+                    child: Container(
+                      width: 76,
+                      height: 76,
+                      decoration: const BoxDecoration(
+                        color: LafleurColors.pink,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        st.playing
+                            ? Icons.pause_rounded
+                            : Icons.play_arrow_rounded,
+                        size: 38,
+                        color: LafleurColors.ink,
+                      ),
+                    ),
+                  ),
+                );
+              }
               // large (640 et plus) : la pochette à gauche, et l'artiste à côté du titre
               final cover = MediaQuery.sizeOf(context).width >= kMiniCoverFrom;
               final title = SizedBox(

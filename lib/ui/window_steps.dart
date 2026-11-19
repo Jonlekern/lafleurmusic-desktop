@@ -8,10 +8,7 @@ const kMiniBelow = 300.0; // moins haute : mini-lecteur
 const kLeaveMiniAbove =
     200.0; // en mini, tirée plus haut : on reprend la taille d'avant
 const kMiniHeight = 130.0; // hauteur où le mini-lecteur se cale
-const kMinWindow = Size(
-  440,
-  kMiniHeight,
-); // plus petit que ça, la barre se couperait
+const kMinWindow = Size(150, kMiniHeight); // le rond rose tout seul
 const kMinPage = Size(
   560,
   kMiniHeight,
@@ -59,3 +56,6 @@ class MiniSnap {
     return s.height == kMiniHeight ? null : Size(s.width, kMiniHeight);
   }
 }
+
+/// Mini-lecteur plus étroit que ça : juste le rond rose.
+const kMiniButtonBelow = 300.0;

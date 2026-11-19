@@ -49,4 +49,8 @@ void main() {
     m.settled(const Size(600, 130));
     expect(m.settled(const Size(600, 240)), const Size(920, 690));
   });
+
+  test('le mini-lecteur peut descendre jusqu\'au rond rose (150 × 130)', () {
+    expect(kMinWindow, const Size(150, 130));
+  });
 }
