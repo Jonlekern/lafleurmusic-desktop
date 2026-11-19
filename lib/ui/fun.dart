@@ -216,8 +216,9 @@ class ShakeController with WindowListener {
   final Duration Function() _clock;
   final _shake = ShakeDetector();
 
+  // macOS : « move » ne vient qu'une fois au début du glissement, « moved » arrive tout du long
   @override
-  void onWindowMove() => moved();
+  void onWindowMoved() => moved();
 
   Future<void> moved() async {
     final p = await _wm.getPosition();

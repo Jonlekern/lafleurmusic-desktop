@@ -245,4 +245,19 @@ void main() {
       expect(player.calls, ['next']);
     },
   );
+
+  test('macOS signale le glissement par « moved » (« move » ne vient qu\'une fois, au départ)', () async {
+    final wm = FakeWm();
+    final player = FakePlayer();
+    var now = Duration.zero;
+    final c = ShakeController(wm, player, clock: () => now);
+    c.onWindowMove(); // début du glissement
+    for (final x in [0.0, 40, 0, 40, 0, 40, 0, 40, 0]) {
+      wm.position = Offset(x.toDouble(), 100);
+      now += const Duration(milliseconds: 80);
+      c.onWindowMoved();
+      await pumpEventQueue();
+    }
+    expect(player.calls, ['next']);
+  });
 }
