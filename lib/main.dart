@@ -33,6 +33,7 @@ import 'tags/tag_writer.dart';
 import 'theme/colors.dart';
 import 'theme/lafleur_theme.dart';
 import 'skins/skins_folder.dart';
+import 'ui/fun.dart';
 import 'ui/library_screen.dart';
 import 'ui/mini_player.dart';
 import 'ui/window_mode.dart';
@@ -145,6 +146,7 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
   late final PlayCounter _plays;
   late final AppLifecycleListener _exit;
   final _window = DesktopWindow();
+  late final _shake = ShakeController(windowManager, widget.player);
   // trois tailles : l'aimant du mini-lecteur (appelé quand on lâche le bord de la fenêtre)
   late final _snap = SnapController(
     windowManager,
@@ -183,6 +185,9 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(_snap);
+    windowManager.addListener(
+      _shake,
+    ); // pour rire : secouer la fenêtre = morceau suivant
     _window.setup().then((_) => _snap.start());
     // Cmd + Q : tout arrêter et fermer la base avant que Dart s'arrête (voir app_exit.dart)
     _exit = AppLifecycleListener(
@@ -230,6 +235,7 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(_snap);
+    windowManager.removeListener(_shake);
     _retry?.cancel();
     _plays.dispose();
     _exit.dispose();
@@ -310,9 +316,11 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
         builder: (context, child) => DropTarget(
           onDragDone: (d) =>
               addDroppedSkins(context, [for (final f in d.files) f.path]),
-          child: WindowSteps(
-            off: () => widget.settings.winampMode,
-            child: child ?? const SizedBox.shrink(),
+          child: SecretRain(
+            child: WindowSteps(
+              off: () => widget.settings.winampMode,
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         ),
         title: 'LAFLEURMUSIC',

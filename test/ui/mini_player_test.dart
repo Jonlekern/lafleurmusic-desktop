@@ -404,4 +404,31 @@ void main() {
       );
     });
   }
+
+  testWidgets('rond rose en lecture : il bat sur les basses, puis revient', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      size: const Size(150, 130),
+      track: _track('Lafleur Surf'),
+    );
+    double scale() => tester
+        .widget<Transform>(find.byKey(const Key('beat')))
+        .transform
+        .getMaxScaleOnAxis();
+    for (var i = 0; i < 20; i++) {
+      player.spectrumCtrl.add([0.3, 0.3, 0.3, 0.1]);
+      await tester.pump(const Duration(milliseconds: 30));
+    }
+    expect(scale(), closeTo(1, 0.001));
+    player.spectrumCtrl.add([0.9, 0.9, 0.9, 0.1]);
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(scale(), greaterThan(1.1));
+    for (var i = 0; i < 12; i++) {
+      player.spectrumCtrl.add([0.3, 0.3, 0.3, 0.1]);
+      await tester.pump(const Duration(milliseconds: 30));
+    }
+    expect(scale(), closeTo(1, 0.001));
+  });
 }

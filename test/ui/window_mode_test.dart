@@ -2,6 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lafleurmusic/ui/window_mode.dart';
 import 'package:lafleurmusic/ui/window_steps.dart';
+import 'package:lafleurmusic/ui/fun.dart';
+
+import 'fake_player.dart';
+
 import 'package:window_manager/window_manager.dart';
 
 /// Fenêtre macOS simulée : plein écran / agrandie comme le Mac de Johnny (1920×1080).
@@ -55,6 +59,10 @@ class FakeWm implements WindowManager {
     calls.add('min ${s.width.round()}x${s.height.round()}');
     minimum = s;
   }
+
+  Offset position = Offset.zero;
+  @override
+  Future<Offset> getPosition() async => position;
 
   @override
   dynamic noSuchMethod(Invocation i) => Future<void>.value();
@@ -215,4 +223,26 @@ void main() {
       },
     );
   });
+
+  test(
+    'fenêtre secouée : morceau suivant ; déplacée normalement : rien',
+    () async {
+      final wm = FakeWm();
+      final player = FakePlayer();
+      var now = Duration.zero;
+      final c = ShakeController(wm, player, clock: () => now);
+      for (var i = 0; i < 30; i++) {
+        wm.position = Offset(i * 10.0, 100);
+        now += const Duration(milliseconds: 16);
+        await c.moved();
+      }
+      expect(player.calls, isEmpty);
+      for (final x in [0.0, 40, 0, 40, 0, 40, 0, 40, 0]) {
+        wm.position = Offset(x.toDouble(), 100);
+        now += const Duration(milliseconds: 80);
+        await c.moved();
+      }
+      expect(player.calls, ['next']);
+    },
+  );
 }

@@ -5,6 +5,7 @@ import '../app_scope.dart';
 import '../player/player.dart';
 import '../theme/colors.dart';
 import 'cover_image.dart';
+import 'fun.dart';
 import 'player_controls.dart';
 import 'window_steps.dart';
 
@@ -64,23 +65,27 @@ class _MiniPlayerState extends State<MiniPlayer> {
               // pour rire : plus étroit que 300, il ne reste que le rond rose
               if (MediaQuery.sizeOf(context).width < kMiniButtonBelow) {
                 return Center(
-                  child: InkWell(
-                    key: const Key('playpause'),
-                    onTap: () => playOrShuffle(AppScope.of(context)),
-                    customBorder: const CircleBorder(),
-                    child: Container(
-                      width: 76,
-                      height: 76,
-                      decoration: const BoxDecoration(
-                        color: LafleurColors.pink,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        st.playing
-                            ? Icons.pause_rounded
-                            : Icons.play_arrow_rounded,
-                        size: 38,
-                        color: LafleurColors.ink,
+                  child: BeatingButton(
+                    spectrum: player.spectrum,
+                    playing: st.playing,
+                    child: InkWell(
+                      key: const Key('playpause'),
+                      onTap: () => playOrShuffle(AppScope.of(context)),
+                      customBorder: const CircleBorder(),
+                      child: Container(
+                        width: 76,
+                        height: 76,
+                        decoration: const BoxDecoration(
+                          color: LafleurColors.pink,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          st.playing
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          size: 38,
+                          color: LafleurColors.ink,
+                        ),
                       ),
                     ),
                   ),
