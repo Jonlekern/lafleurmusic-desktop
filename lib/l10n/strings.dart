@@ -68,6 +68,7 @@ class Strings {
   String minutes(int n) => '$n min';
   String get nowPlaying => _t('EN COURS', 'NOW PLAYING');
   String get upNext => _t('À SUIVRE', 'UP NEXT');
+  String get upNextTab => _t('À suivre', 'Up next');
   String get search => _t('Rechercher', 'Search');
   String get unknownArtist => _t('Inconnu', 'Unknown');
   String get nasMissing => _t(

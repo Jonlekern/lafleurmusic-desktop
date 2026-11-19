@@ -11,9 +11,12 @@ import 'package:lafleurmusic/library/db.dart';
 import 'package:lafleurmusic/library/models.dart';
 import 'package:lafleurmusic/player/equalizer.dart';
 import 'package:lafleurmusic/player/player.dart';
+import 'package:lafleurmusic/settings.dart';
 import 'package:lafleurmusic/theme/colors.dart';
 import 'package:lafleurmusic/theme/lafleur_theme.dart';
+import 'package:lafleurmusic/ui/equalizer_panel.dart';
 import 'package:lafleurmusic/ui/now_playing_screen.dart';
+import 'package:lafleurmusic/ui/playback_card.dart';
 
 import 'fake_player.dart';
 import 'fonts.dart';
@@ -21,18 +24,56 @@ import 'fonts.dart';
 void main() {
   setUpAll(loadFonts);
 
-  testWidgets('En cours + égaliseur comme la maquette 4', (tester) async {
-    await _nowPlaying(tester, 'goldens/4-en-cours-egaliseur.png');
+  testWidgets('En cours, onglet Égaliseur', (tester) async {
+    await _pump(tester, AppSettings()..nowTab = 1);
+    await _golden('goldens/4-en-cours-egaliseur.png');
   });
 
-  testWidgets('mode jour : En cours + égaliseur', (tester) async {
+  testWidgets('mode jour : En cours, onglet Égaliseur', (tester) async {
     LafleurPalette.current = LafleurPalette.day;
     addTearDown(() => LafleurPalette.current = LafleurPalette.night);
-    await _nowPlaying(tester, 'goldens/4-en-cours-egaliseur-jour.png');
+    await _pump(tester, AppSettings()..nowTab = 1);
+    await _golden('goldens/4-en-cours-egaliseur-jour.png');
+  });
+
+  testWidgets('En cours, onglet À suivre (maquette file-attente)', (
+    tester,
+  ) async {
+    await _pump(tester, AppSettings());
+    await _golden('goldens/4b-en-cours-a-suivre.png');
+  });
+
+  testWidgets('onglets : À suivre d\'abord, le choix est retenu', (
+    tester,
+  ) async {
+    final settings = AppSettings();
+    var saved = 0;
+    await _pump(tester, settings, save: () => saved++);
+    // À suivre : la suite de l'album, pas d'égaliseur
+    expect(find.text('T3'), findsWidgets);
+    expect(find.byType(EqualizerPanel), findsNothing);
+    expect(find.byType(PlaybackCard), findsNothing);
+    await tester.tap(find.text('Égaliseur'));
+    await tester.pump();
+    expect(find.byType(EqualizerPanel), findsOneWidget);
+    expect(settings.nowTab, 1);
+    expect(saved, 1);
+    await tester.tap(find.text('Lecture'));
+    await tester.pump();
+    expect(find.byType(PlaybackCard), findsOneWidget);
+    expect(find.byType(EqualizerPanel), findsNothing);
+    expect(settings.nowTab, 2);
   });
 }
 
-Future<void> _nowPlaying(WidgetTester tester, String golden) async {
+Future<void> _golden(String golden) =>
+    expectLater(find.byType(NowPlayingScreen), matchesGoldenFile(golden));
+
+Future<void> _pump(
+  WidgetTester tester,
+  AppSettings settings, {
+  VoidCallback? save,
+}) async {
   desktopSize(tester);
   final db = LibraryDb(
     DatabaseConnection(
@@ -78,6 +119,8 @@ Future<void> _nowPlaying(WidgetTester tester, String golden) async {
         embedded: (_) async => null,
       ),
       strings: Strings.of(const Locale('fr')),
+      settings: settings,
+      saveSettings: save,
       child: MaterialApp(
         theme: lafleurTheme(LafleurPalette.current),
         home: const NowPlayingScreen(),
@@ -92,5 +135,4 @@ Future<void> _nowPlaying(WidgetTester tester, String golden) async {
   ]);
   expect(find.text('2 sur 9 · Studio Lafleur'), findsOneWidget);
   expect(tester.takeException(), isNull);
-  await expectLater(find.byType(NowPlayingScreen), matchesGoldenFile(golden));
 }

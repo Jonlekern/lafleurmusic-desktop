@@ -22,6 +22,7 @@ class AppSettings {
     this.equalVolume = false,
     this.crossfade = false,
     this.crossfadeSeconds = 5,
+    this.nowTab = 0,
   }) : equalizer = equalizer ?? Equalizer.named('flat');
   Equalizer equalizer;
   bool artistGrid; // vue Artistes : grille de photos (sinon liste)
@@ -40,6 +41,7 @@ class AppSettings {
   bool equalVolume; // tous les morceaux au même niveau sonore
   bool crossfade; // fondu enchaîné
   int crossfadeSeconds; // 1 à 10 s
+  int nowTab; // écran En cours : 0 À suivre, 1 Égaliseur, 2 Lecture
 
   static Size? _size(Object? v) =>
       v is List && v.length == 2 && v[0] is num && v[1] is num
@@ -77,6 +79,12 @@ class AppSettings {
           crossfadeSeconds: j['crossfadeSeconds'] is int
               ? (j['crossfadeSeconds']! as int).clamp(1, 10)
               : 5,
+          nowTab:
+              j['nowTab'] is int &&
+                  (j['nowTab']! as int) >= 0 &&
+                  (j['nowTab']! as int) <= 2
+              ? j['nowTab']! as int
+              : 0,
         );
       }
     } on Object {
@@ -112,6 +120,7 @@ class AppSettings {
         'equalVolume': equalVolume,
         'crossfade': crossfade,
         'crossfadeSeconds': crossfadeSeconds,
+        'nowTab': nowTab,
       }),
     );
     await tmp.rename(f.path);

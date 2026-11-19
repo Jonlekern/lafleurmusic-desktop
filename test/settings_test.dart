@@ -143,4 +143,16 @@ void main() {
     await (AppSettings()..miniRestore = const Size(1000, 700)).save(f);
     expect((await AppSettings.load(f)).miniRestore, const Size(1000, 700));
   });
+
+  test(
+    'onglet de l\'écran En cours : À suivre par défaut, puis retenu',
+    () async {
+      final f = File('${dir.path}/t.json');
+      expect((await AppSettings.load(f)).nowTab, 0);
+      await (AppSettings()..nowTab = 2).save(f);
+      expect((await AppSettings.load(f)).nowTab, 2);
+      await f.writeAsString('{"nowTab": 9}');
+      expect((await AppSettings.load(f)).nowTab, 0);
+    },
+  );
 }

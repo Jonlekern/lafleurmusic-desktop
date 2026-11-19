@@ -7,16 +7,57 @@ import '../theme/colors.dart';
 import '../theme/widgets.dart';
 import 'cover_image.dart';
 import 'equalizer_panel.dart';
+import 'now_panel.dart';
 import 'playback_card.dart';
 import 'player_bar.dart';
 
-/// En cours + égaliseur (maquette 4). Échap pour revenir.
-class NowPlayingScreen extends StatelessWidget {
+/// En cours (maquette 4) : onglets À suivre · Égaliseur · Lecture (maquette file-attente). Échap pour revenir.
+class NowPlayingScreen extends StatefulWidget {
   const NowPlayingScreen({super.key});
+
+  @override
+  State<NowPlayingScreen> createState() => _NowPlayingScreenState();
+}
+
+class _NowPlayingScreenState extends State<NowPlayingScreen> {
+  int? _tab; // 0 À suivre, 1 Égaliseur, 2 Lecture ; retenu dans les réglages
+
+  void _choose(AppScope app, int tab) {
+    setState(() => _tab = tab);
+    final settings = app.settings;
+    if (settings == null || settings.nowTab == tab) return;
+    settings.nowTab = tab;
+    app.saveSettings?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
     final app = AppScope.of(context);
+    final tab = _tab ?? app.settings?.nowTab ?? 0;
+    // pastilles comme sur le téléphone : bord et texte roses pour l'onglet choisi
+    Widget pill(int k, String label) => GestureDetector(
+      onTap: () => _choose(app, k),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: tab == k ? LafleurColors.pink : LafleurColors.p.outline,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: tab == k ? LafleurColors.pink : LafleurColors.text,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ),
+    );
     final s = app.strings;
     return Focus(
       autofocus: true,
@@ -100,12 +141,43 @@ class NowPlayingScreen extends StatelessWidget {
                                 style: const TextStyle(fontSize: 22),
                               ),
                               const SizedBox(height: 46),
-                              EqualizerPanel(
-                                equalizer: app.equalizer,
-                                strings: s,
+                              Row(
+                                children: [
+                                  pill(0, s.upNextTab),
+                                  const SizedBox(width: 8),
+                                  pill(1, s.equalizer),
+                                  const SizedBox(width: 8),
+                                  pill(2, s.playbackCard),
+                                ],
                               ),
-                              const SizedBox(height: 22),
-                              const PlaybackCard(),
+                              const SizedBox(height: 16),
+                              switch (tab) {
+                                1 => EqualizerPanel(
+                                  equalizer: app.equalizer,
+                                  strings: s,
+                                ),
+                                2 => const PlaybackCard(),
+                                _ => Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.fromLTRB(
+                                    26,
+                                    20,
+                                    26,
+                                    16,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: LafleurColors.panel,
+                                    border: Border.all(
+                                      color: LafleurColors.line,
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: const UpNextSection(
+                                    title: false,
+                                    coverSize: 30,
+                                  ),
+                                ),
+                              },
                             ],
                           ),
                         ),
