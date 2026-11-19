@@ -94,11 +94,13 @@ class TitleBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // fenêtre étroite (taille moyenne) : logo plus petit, centré dans la place laissée par la recherche
-    final narrow = MediaQuery.sizeOf(context).width < 880;
+    // fenêtre étroite (taille moyenne) : logo plus petit
+    final h = MediaQuery.sizeOf(context).width < 880 ? 16.0 : 20.0;
     final logo = Image.asset(
       'assets/logo-texte-grand.png',
-      height: narrow ? 16 : 20,
+      key: const Key('logo'),
+      height: h,
+      width: h * 20, // le logo fait 900 × 45
       // logo blanc la nuit, noir le jour
       color: LafleurColors.p.brightness == Brightness.light
           ? LafleurColors.text
@@ -112,27 +114,56 @@ class TitleBar extends StatelessWidget {
         border: Border(bottom: BorderSide(color: LafleurColors.line)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: narrow
-          ? Row(
-              children: [
-                Expanded(
-                  child: Center(
-                    child: FittedBox(fit: BoxFit.scaleDown, child: logo),
-                  ),
-                ),
-                if (trailing != null) ...[const SizedBox(width: 12), trailing!],
-              ],
-            )
-          : Stack(
-              alignment: Alignment.center,
-              children: [
-                logo,
-                if (trailing != null)
-                  Align(alignment: Alignment.centerRight, child: trailing),
-              ],
-            ),
+      child: CustomMultiChildLayout(
+        delegate: _TitleBarLayout(),
+        children: [
+          LayoutId(
+            id: _TitleBarLayout.logo,
+            child: FittedBox(fit: BoxFit.scaleDown, child: logo),
+          ),
+          if (trailing != null)
+            LayoutId(id: _TitleBarLayout.trailing, child: trailing!),
+        ],
+      ),
     );
   }
+}
+
+/// Logo au milieu de la fenêtre s'il y a la place ; sinon centré dans la place à gauche
+/// de la recherche, et rétréci si même ça ne suffit pas. Jamais sous la recherche.
+class _TitleBarLayout extends MultiChildLayoutDelegate {
+  static const logo = 'logo', trailing = 'trailing', gap = 12.0;
+
+  @override
+  void performLayout(Size size) {
+    var right = size.width; // bord droit de la place du logo
+    if (hasChild(trailing)) {
+      final t = layoutChild(trailing, BoxConstraints.loose(size));
+      positionChild(
+        trailing,
+        Offset(size.width - t.width, (size.height - t.height) / 2),
+      );
+      right = size.width - t.width - gap;
+    }
+    final l = layoutChild(
+      logo,
+      BoxConstraints(
+        maxWidth: right.clamp(0, size.width),
+        maxHeight: size.height,
+      ),
+    );
+    var x = (size.width - l.width) / 2; // au milieu de la fenêtre
+    if (x + l.width > right) {
+      x = (right - l.width) / 2; // au milieu de la place libre
+    }
+    positionChild(
+      logo,
+      Offset(x.clamp(0, size.width), (size.height - l.height) / 2),
+    );
+  }
+
+  @override
+  bool shouldRelayout(_TitleBarLayout oldDelegate) => false;
 }
 
 /// Contour en pointillés arrondi (zone de dépôt de la maquette 1).
