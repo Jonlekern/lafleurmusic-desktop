@@ -17,6 +17,8 @@ const kMinPage = Size(
   kMiniHeight,
 ); // hors mini-lecteur : la page tient encore
 const kDefaultWindow = Size(920, 690);
+const kMiniCoverFrom =
+    640.0; // mini-lecteur au moins aussi large : la pochette à gauche
 
 WindowStep stepFor(Size s) {
   if (s.height < kMiniBelow) return WindowStep.mini;

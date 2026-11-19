@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../app_scope.dart';
 import '../player/player.dart';
 import '../theme/colors.dart';
+import 'cover_image.dart';
 import 'player_controls.dart';
 import 'window_steps.dart';
 
@@ -59,37 +60,63 @@ class _MiniPlayerState extends State<MiniPlayer> {
             initialData: player.current,
             builder: (context, snap) {
               final st = snap.data ?? const PlayerState();
+              final t = st.track;
+              // large (640 et plus) : la pochette à gauche, et l'artiste à côté du titre
+              final cover = MediaQuery.sizeOf(context).width >= kMiniCoverFrom;
+              final title = SizedBox(
+                height: 18,
+                child: Text.rich(
+                  TextSpan(
+                    text: t?.title ?? '',
+                    children: [
+                      if (cover && t != null && t.artist.isNotEmpty)
+                        TextSpan(
+                          text: '  ${t.artist}',
+                          style: TextStyle(
+                            color: LafleurColors.sub,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                    ],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              );
+              final controls = Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  title,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PlaybackButtons(st: st),
+                        const SizedBox(width: 12),
+                        const VolumeControl(),
+                      ],
+                    ),
+                  ),
+                  ProgressRow(st: st, width: cover ? double.infinity : 380),
+                ],
+              );
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 18,
-                      child: Text(
-                        st.track?.title ?? '',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                child: cover
+                    ? Row(
                         children: [
-                          PlaybackButtons(st: st),
-                          const SizedBox(width: 12),
-                          const VolumeControl(),
+                          CoverImage(trackPath: t?.path, size: 100, radius: 6),
+                          const SizedBox(width: 18),
+                          Expanded(child: controls),
                         ],
-                      ),
-                    ),
-                    ProgressRow(st: st, width: 380),
-                  ],
-                ),
+                      )
+                    : controls,
               );
             },
           ),

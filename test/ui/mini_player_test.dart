@@ -308,4 +308,57 @@ void main() {
     expect(player.calls, isEmpty);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('mini large (700) : la pochette à gauche, et l\'artiste', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      size: const Size(700, 130),
+      track: _track('Lafleur Surf'),
+    );
+    expect(find.byType(CoverImage), findsOneWidget);
+    expect(
+      find.textContaining('LAFLEURSTUDIO', findRichText: true),
+      findsOneWidget,
+    );
+    expect(
+      tester.getCenter(find.byType(CoverImage)).dx,
+      lessThan(tester.getCenter(find.byKey(const Key('playpause'))).dx),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('mini étroit (600) : la bande, sans pochette', (tester) async {
+    await pump(
+      tester,
+      size: const Size(600, 130),
+      track: _track('Lafleur Surf'),
+    );
+    expect(find.byType(CoverImage), findsNothing);
+  });
+
+  for (final day in [false, true]) {
+    testWidgets('image : mini avec pochette ${day ? 'jour' : 'nuit'}', (
+      tester,
+    ) async {
+      if (day) {
+        LafleurPalette.current = LafleurPalette.day;
+        addTearDown(() => LafleurPalette.current = LafleurPalette.night);
+      }
+      await pump(
+        tester,
+        size: const Size(700, 130),
+        track: _track('Lafleur Surf'),
+      );
+      await precacheAssets(tester, [
+        'assets/fleur-tile.png',
+        'assets/fleur.png',
+      ]);
+      await expectLater(
+        find.byType(MiniPlayer),
+        matchesGoldenFile('goldens/10-mini-pochette${day ? '-jour' : ''}.png'),
+      );
+    });
+  }
 }
