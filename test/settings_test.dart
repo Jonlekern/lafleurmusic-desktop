@@ -136,4 +136,11 @@ void main() {
       expect((await AppSettings.load(bad)).crossfadeSeconds, 10);
     },
   );
+
+  test('taille d\'avant le mini-lecteur : absente, puis retrouvée', () async {
+    final f = File('${dir.path}/m.json');
+    expect((await AppSettings.load(f)).miniRestore, isNull);
+    await (AppSettings()..miniRestore = const Size(1000, 700)).save(f);
+    expect((await AppSettings.load(f)).miniRestore, const Size(1000, 700));
+  });
 }

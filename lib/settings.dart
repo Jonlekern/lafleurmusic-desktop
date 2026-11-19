@@ -18,6 +18,7 @@ class AppSettings {
     this.visMode = 0,
     this.winampMode = false,
     this.lafleurSize,
+    this.miniRestore,
     this.equalVolume = false,
     this.crossfade = false,
     this.crossfadeSeconds = 5,
@@ -33,10 +34,17 @@ class AppSettings {
   bool winampMode; // l'appli était en Winamp en quittant
   Size?
   lafleurSize; // taille de la grande fenêtre, retrouvée en sortant du Winamp
+  // taille d'avant le mini-lecteur (non nulle = l'appli a été quittée en mini-lecteur)
+  Size? miniRestore;
   // carte Lecture (plan 5)
   bool equalVolume; // tous les morceaux au même niveau sonore
   bool crossfade; // fondu enchaîné
   int crossfadeSeconds; // 1 à 10 s
+
+  static Size? _size(Object? v) =>
+      v is List && v.length == 2 && v[0] is num && v[1] is num
+      ? Size((v[0] as num).toDouble(), (v[1] as num).toDouble())
+      : null;
 
   static Future<AppSettings> load(File f) async {
     try {
@@ -63,6 +71,7 @@ class AppSettings {
                   ((j['lafleurSize']! as List)[1] as num).toDouble(),
                 )
               : null,
+          miniRestore: _size(j['miniRestore']),
           equalVolume: j['equalVolume'] == true,
           crossfade: j['crossfade'] == true,
           crossfadeSeconds: j['crossfadeSeconds'] is int
@@ -97,6 +106,9 @@ class AppSettings {
         'lafleurSize': lafleurSize == null
             ? null
             : [lafleurSize!.width, lafleurSize!.height],
+        'miniRestore': miniRestore == null
+            ? null
+            : [miniRestore!.width, miniRestore!.height],
         'equalVolume': equalVolume,
         'crossfade': crossfade,
         'crossfadeSeconds': crossfadeSeconds,
