@@ -18,8 +18,11 @@ class BeatPulse {
     final low = bars.take(3).toList();
     final bass = low.isEmpty ? 0.0 : low.reduce((a, b) => a + b) / low.length;
     pulse = max(0, pulse - dt / 0.18);
-    // un coup : nettement plus fort que la moyenne, et pas dans le silence
-    if (_avg > 0 && bass > _avg * 1.3 && bass > 0.15) pulse = 1;
+    // un coup : 15 % au-dessus de la moyenne, et pas dans le silence. Le spectre est pris après
+    // le volume et plafonne à 1 : pas de seuil fixe (à bas volume rien ne battait), et près du
+    // plafond l'écart demandé se réduit à la moitié de la place qui reste (à fort volume non plus).
+    final margin = min(_avg * 0.15, (1 - _avg) * 0.5);
+    if (_avg > 0 && bass > _avg + margin && bass > 0.02) pulse = 1;
     _avg = _avg == 0 ? bass : _avg * 0.9 + bass * 0.1;
     return pulse;
   }

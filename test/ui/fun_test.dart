@@ -29,6 +29,48 @@ void main() {
       expect(p, 0);
     });
 
+    test('volume bas (basses faibles) : il bat quand même', () {
+      final b = BeatPulse();
+      for (var i = 0; i < 30; i++) {
+        b.feed(bars(0.05), 0.03);
+      }
+      expect(b.feed(bars(0.09), 0.03), 1);
+    });
+
+    test('coup modéré (20 % au-dessus de la moyenne) : il bat', () {
+      final b = BeatPulse();
+      for (var i = 0; i < 30; i++) {
+        b.feed(bars(0.3), 0.03);
+      }
+      expect(b.feed(bars(0.36), 0.03), 1);
+    });
+
+    test('volume fort (basses presque au maximum) : il bat quand même', () {
+      final b = BeatPulse();
+      for (var i = 0; i < 30; i++) {
+        b.feed(bars(0.9), 0.03);
+      }
+      expect(b.feed(bars(0.97), 0.03), 1);
+    });
+
+    test('volume fort, basses qui tremblent un peu : il ne bat pas', () {
+      final b = BeatPulse();
+      var p = 0.0;
+      for (var i = 0; i < 60; i++) {
+        p = b.feed(bars(i.isEven ? 0.9 : 0.92), 0.03);
+      }
+      expect(p, 0);
+    });
+
+    test('basses qui tremblent un peu (±5 %) : il ne bat pas', () {
+      final b = BeatPulse();
+      var p = 0.0;
+      for (var i = 0; i < 60; i++) {
+        p = b.feed(bars(i.isEven ? 0.3 : 0.315), 0.03);
+      }
+      expect(p, 0);
+    });
+
     test('silence : il ne bat pas', () {
       final b = BeatPulse();
       for (var i = 0; i < 30; i++) {
