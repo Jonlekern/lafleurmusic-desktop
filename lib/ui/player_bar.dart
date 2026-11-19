@@ -23,6 +23,7 @@ class PlayerBar extends StatefulWidget {
 
 class _PlayerBarState extends State<PlayerBar> {
   double _volume = 80;
+  double? _drag; // le rond qu'on glisse sur la barre de progression (0 à 1)
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,7 @@ class _PlayerBarState extends State<PlayerBar> {
           final q = app.player.queue;
           final t = st.track;
           final total = st.duration.inMilliseconds;
-          final f = total > 0
+          final played = total > 0
               ? (st.position.inMilliseconds / total).clamp(0.0, 1.0)
               : 0.0;
           return Row(
@@ -141,7 +142,7 @@ class _PlayerBarState extends State<PlayerBar> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 0), // la zone cliquable de la barre (26) remplace l'écart
                     SizedBox(
                       width: 560,
                       child: Row(
@@ -156,57 +157,75 @@ class _PlayerBarState extends State<PlayerBar> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: LayoutBuilder(
-                              builder: (_, c) => GestureDetector(
-                                onTapDown: (d) => total > 0
+                              builder: (_, c) {
+                                double at(double dx) =>
+                                    (dx / c.maxWidth).clamp(0.0, 1.0);
+                                void go(double frac) => total > 0
                                     ? app.player.seek(
                                         Duration(
-                                          milliseconds:
-                                              (d.localPosition.dx /
-                                                      c.maxWidth *
-                                                      total)
-                                                  .round(),
+                                          milliseconds: (frac * total).round(),
                                         ),
                                       )
-                                    : null,
-                                child: SizedBox(
-                                  height: 14,
-                                  child: Stack(
-                                    alignment: Alignment.centerLeft,
-                                    children: [
-                                      Container(
-                                        height: 5,
-                                        decoration: BoxDecoration(
-                                          color: LafleurColors.p.track,
-                                          borderRadius: BorderRadius.circular(
-                                            3,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        height: 5,
-                                        width: c.maxWidth * f,
-                                        decoration: BoxDecoration(
-                                          color: LafleurColors.pink,
-                                          borderRadius: BorderRadius.circular(
-                                            3,
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: (c.maxWidth * f - 6.5).clamp(
-                                          0,
-                                          c.maxWidth - 13,
-                                        ),
-                                        child: Container(
-                                          width: 13,
-                                          height: 13,
-                                          decoration: knobDecoration(),
-                                        ),
-                                      ),
-                                    ],
+                                    : null;
+                                final f = _drag ?? played;
+                                // zone cliquable plus haute que la ligne, et le rond se glisse
+                                return GestureDetector(
+                                  key: const Key('progress'),
+                                  behavior: HitTestBehavior.opaque,
+                                  onTapUp: (d) => go(at(d.localPosition.dx)),
+                                  onHorizontalDragStart: (d) => setState(
+                                    () => _drag = at(d.localPosition.dx),
                                   ),
-                                ),
-                              ),
+                                  onHorizontalDragUpdate: (d) => setState(
+                                    () => _drag = at(d.localPosition.dx),
+                                  ),
+                                  onHorizontalDragEnd: (_) {
+                                    final d = _drag;
+                                    setState(() => _drag = null);
+                                    if (d != null) go(d);
+                                  },
+                                  onHorizontalDragCancel: () =>
+                                      setState(() => _drag = null),
+                                  child: SizedBox(
+                                    height: 26,
+                                    child: Stack(
+                                      alignment: Alignment.centerLeft,
+                                      children: [
+                                        Container(
+                                          height: 5,
+                                          decoration: BoxDecoration(
+                                            color: LafleurColors.p.track,
+                                            borderRadius: BorderRadius.circular(
+                                              3,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          height: 5,
+                                          width: c.maxWidth * f,
+                                          decoration: BoxDecoration(
+                                            color: LafleurColors.pink,
+                                            borderRadius: BorderRadius.circular(
+                                              3,
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: (c.maxWidth * f - 6.5).clamp(
+                                            0,
+                                            c.maxWidth - 13,
+                                          ),
+                                          child: Container(
+                                            width: 13,
+                                            height: 13,
+                                            decoration: knobDecoration(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(width: 10),

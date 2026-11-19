@@ -44,8 +44,12 @@ class FakePlayer implements PlayerController {
   Future<void> next() async => calls.add('next');
   @override
   Future<void> previous() async => calls.add('previous');
+  Duration? lastSeek;
   @override
-  Future<void> seek(Duration d) async => calls.add('seek');
+  Future<void> seek(Duration d) async {
+    calls.add('seek');
+    lastSeek = d;
+  }
   @override
   Future<void> setVolume(double v) async {
     calls.add('volume');
