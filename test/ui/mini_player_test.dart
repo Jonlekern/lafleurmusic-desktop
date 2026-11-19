@@ -144,4 +144,28 @@ void main() {
       );
     });
   }
+
+  testWidgets('fenêtre basse : mini-lecteur, la page reste vivante derrière', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      size: const Size(900, 130),
+      track: _track('Lafleur Surf'),
+      child: const WindowSteps(child: Text('page')),
+    );
+    expect(find.byType(MiniPlayer), findsOneWidget);
+    expect(find.text('page'), findsNothing);
+    expect(find.text('page', skipOffstage: false), findsOneWidget);
+  });
+
+  testWidgets('fenêtre haute : la page, pas de mini-lecteur', (tester) async {
+    await pump(
+      tester,
+      size: const Size(900, 690),
+      child: const WindowSteps(child: Text('page')),
+    );
+    expect(find.text('page'), findsOneWidget);
+    expect(find.byType(MiniPlayer), findsNothing);
+  });
 }

@@ -135,9 +135,10 @@ class _ProgressRowState extends State<ProgressRow> {
                           ),
                         ),
                         Positioned(
+                          // très étroite : le rond reste au bord sans planter
                           left: (c.maxWidth * f - 6.5).clamp(
                             0,
-                            c.maxWidth - 13,
+                            (c.maxWidth - 13).clamp(0.0, double.infinity),
                           ),
                           child: Container(
                             width: 13,

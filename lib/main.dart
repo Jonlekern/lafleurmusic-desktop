@@ -34,6 +34,7 @@ import 'theme/colors.dart';
 import 'theme/lafleur_theme.dart';
 import 'skins/skins_folder.dart';
 import 'ui/library_screen.dart';
+import 'ui/mini_player.dart';
 import 'ui/window_mode.dart';
 import 'ui/winamp/winamp_screen.dart';
 import 'ui/welcome_screen.dart';
@@ -144,6 +145,16 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
   late final PlayCounter _plays;
   late final AppLifecycleListener _exit;
   final _window = DesktopWindow();
+  // trois tailles : l'aimant du mini-lecteur (appelé quand on lâche le bord de la fenêtre)
+  late final _snap = SnapController(
+    windowManager,
+    restore: widget.settings.miniRestore,
+    paused: () => widget.settings.winampMode,
+    onRestore: (r) {
+      widget.settings.miniRestore = r;
+      widget.saveSettings();
+    },
+  );
   bool _winampTried = false;
   late final Scanner _scanner = Scanner(widget.db, TagLibReader());
   late final TagWriter _writer = TagWriter(
@@ -171,6 +182,8 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    windowManager.addListener(_snap);
+    _window.setup().then((_) => _snap.start());
     // Cmd + Q : tout arrêter et fermer la base avant que Dart s'arrête (voir app_exit.dart)
     _exit = AppLifecycleListener(
       onExitRequested: () => closeBeforeExit([
@@ -216,6 +229,7 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    windowManager.removeListener(_snap);
     _retry?.cancel();
     _plays.dispose();
     _exit.dispose();
@@ -296,7 +310,10 @@ class _LafleurAppState extends State<LafleurApp> with WidgetsBindingObserver {
         builder: (context, child) => DropTarget(
           onDragDone: (d) =>
               addDroppedSkins(context, [for (final f in d.files) f.path]),
-          child: child ?? const SizedBox.shrink(),
+          child: WindowSteps(
+            off: () => widget.settings.winampMode,
+            child: child ?? const SizedBox.shrink(),
+          ),
         ),
         title: 'LAFLEURMUSIC',
         debugShowCheckedModeBanner: false,

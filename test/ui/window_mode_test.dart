@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lafleurmusic/ui/window_mode.dart';
+import 'package:lafleurmusic/ui/window_steps.dart';
 import 'package:window_manager/window_manager.dart';
 
 /// Fenêtre macOS simulée : plein écran / agrandie comme le Mac de Johnny (1920×1080).
@@ -46,6 +47,13 @@ class FakeWm implements WindowManager {
       'size ${s.width.round()}x${s.height.round()}${full ? ' (ignorée)' : ''}',
     );
     if (!full) size = s;
+  }
+
+  Size? minimum;
+  @override
+  Future<void> setMinimumSize(Size s) async {
+    calls.add('min ${s.width.round()}x${s.height.round()}');
+    minimum = s;
   }
 
   @override
@@ -104,5 +112,92 @@ void main() {
       isEmpty,
     );
     expect(wm.size, const Size(920, 690));
+  });
+
+  test(
+    'sortie du skin Winamp : la taille minimale de la page revient',
+    () async {
+      final wm = FakeWm();
+      final w = DesktopWindow(wm: wm);
+      final previous = await w.enterWinamp(winamp);
+      await w.leaveWinamp(previous);
+      expect(wm.minimum, kMinPage);
+    },
+  );
+
+  test('au démarrage : la fenêtre ne descend pas sous la page', () async {
+    final wm = FakeWm();
+    await DesktopWindow(wm: wm).setup();
+    expect(wm.minimum, kMinPage);
+  });
+
+  group('aimant du mini-lecteur', () {
+    late FakeWm wm;
+    late List<Size?> saved;
+    var paused = false;
+    SnapController make({Size? restore}) {
+      saved = [];
+      return SnapController(
+        wm,
+        restore: restore,
+        paused: () => paused,
+        onRestore: saved.add,
+      );
+    }
+
+    setUp(() {
+      wm = FakeWm(size: const Size(920, 690));
+      paused = false;
+    });
+
+    test('lâchée sous 300 : calée à 130, minimum 440 × 130, taille d\'avant gardée', () async {
+      final c = make();
+      await c.start();
+      wm.size = const Size(900, 250);
+      await c.resized();
+      expect(wm.size, const Size(900, 130));
+      expect(wm.minimum, kMinWindow);
+      expect(saved.last, const Size(920, 690));
+    });
+
+    test('tirée au-delà de 200 : taille d\'avant, minimum de la page, plus rien de gardé', () async {
+      final c = make();
+      await c.start();
+      wm.size = const Size(900, 250);
+      await c.resized();
+      wm.size = const Size(900, 260);
+      await c.resized();
+      expect(wm.size, const Size(920, 690));
+      expect(wm.minimum, kMinPage);
+      expect(saved.last, isNull);
+    });
+
+    test('pendant le skin Winamp : rien ne bouge', () async {
+      final c = make();
+      await c.start();
+      paused = true;
+      wm.size = const Size(275, 116);
+      await c.resized();
+      expect(wm.size, const Size(275, 116));
+    });
+
+    test('plein écran : rien ne bouge', () async {
+      final c = make();
+      await c.start();
+      wm.full = true;
+      wm.size = const Size(1920, 250);
+      await c.resized();
+      expect(wm.calls.where((x) => x.startsWith('size')), isEmpty);
+    });
+
+    test('quittée en mini-lecteur : rouverte en mini-lecteur', () async {
+      final c = make(restore: const Size(1000, 700));
+      await c.start();
+      expect(wm.size, const Size(480, 130));
+      expect(wm.minimum, kMinWindow);
+      wm.size = const Size(480, 240);
+      await c.resized();
+      expect(wm.size, const Size(1000, 700));
+    });
   });
 }

@@ -5,6 +5,7 @@ import '../app_scope.dart';
 import '../player/player.dart';
 import '../theme/colors.dart';
 import 'player_controls.dart';
+import 'window_steps.dart';
 
 /// Le mini-lecteur (fenêtre de moins de 300 de haut) : titre, boutons + volume, barre de temps.
 class MiniPlayer extends StatelessWidget {
@@ -72,6 +73,29 @@ class MiniPlayer extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+/// Fenêtre basse : le mini-lecteur à la place de la page, qui reste vivante derrière (écran, défilement).
+class WindowSteps extends StatelessWidget {
+  const WindowSteps({super.key, required this.child, this.off});
+  final Widget child;
+  final bool Function()?
+  off; // skin Winamp ouvert : sa petite fenêtre n'est pas le mini-lecteur
+
+  @override
+  Widget build(BuildContext context) {
+    if (off?.call() == true ||
+        stepFor(MediaQuery.sizeOf(context)) != WindowStep.mini) {
+      return child;
+    }
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Offstage(child: child),
+        const Positioned.fill(child: MiniPlayer()),
+      ],
     );
   }
 }

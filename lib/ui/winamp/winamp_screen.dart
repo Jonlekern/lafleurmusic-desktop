@@ -97,10 +97,12 @@ Future<void> _open(BuildContext context) async {
     eq: settings.winampEq,
     pl: settings.winampPl,
   );
+  // marqué avant de rétrécir : la fenêtre basse du Winamp ne doit pas passer en mini-lecteur
+  final wasWinamp = settings.winampMode;
+  settings.winampMode = true;
   final previous = await window.enterWinamp(size);
   // relancée en Winamp, la fenêtre a sa taille de départ : on garde la taille LAFLEUR enregistrée
-  if (!settings.winampMode) settings.lafleurSize = previous;
-  settings.winampMode = true;
+  if (!wasWinamp) settings.lafleurSize = previous;
   app.saveSettings?.call();
   if (!context.mounted) return;
   _opening = false;
