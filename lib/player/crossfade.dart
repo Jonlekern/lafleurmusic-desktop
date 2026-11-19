@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:mpv_audio_kit/mpv_audio_kit.dart';
 
+import 'audio_output.dart';
+
 import 'queue.dart';
 
 /// Quand commencer le fondu et comment croiser les volumes.
@@ -67,18 +69,17 @@ abstract interface class Deck {
 /// 2e lecteur mpv, créé au premier fondu.
 class MpvDeck implements Deck {
   Player? _p;
-  Player get _player => _p ??=
-      Player(
-          configuration: const PlayerConfiguration(
-            autoPlay: true,
-            initialVolume: 0,
-          ),
-        )
-        // même sortie fixe que le lecteur principal (voir LafleurPlayer)
-        ..setAudioSampleRate(48000)
-        ..setAudioFormat(Format.float32)
-        ..setAudioChannels(Channels.stereo)
-        ..setReplayGain(const ReplayGainSettings(mode: ReplayGain.track));
+  Player get _player => _p ??= () {
+    final p = Player(
+      configuration: const PlayerConfiguration(
+        autoPlay: true,
+        initialVolume: 0,
+      ),
+    );
+    fixedOutput(p); // même sortie que le lecteur principal
+    p.setReplayGain(const ReplayGainSettings(mode: ReplayGain.track));
+    return p;
+  }();
 
   @override
   Future<void> play(String path) async {

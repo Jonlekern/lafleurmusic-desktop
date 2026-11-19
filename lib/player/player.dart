@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:async/async.dart' show StreamGroup;
 import 'package:mpv_audio_kit/mpv_audio_kit.dart' hide Track;
 
+import 'audio_output.dart';
+
 import '../library/models.dart';
 import 'crossfade.dart';
 import 'eq_effects.dart';
@@ -94,11 +96,7 @@ class LafleurPlayer implements PlayerController {
   LafleurPlayer()
     : _mpv = Player(configuration: const PlayerConfiguration(autoPlay: true)) {
     _mpv.setGapless(Gapless.weak);
-    // sortie audio fixe (48 kHz, float, stéréo) : mpv ne rouvre pas CoreAudio à chaque changement de format,
-    // ce qui faisait planter mpv_audio_kit sur le Mac (44,1 kHz → 48 kHz)
-    _mpv.setAudioSampleRate(48000);
-    _mpv.setAudioFormat(Format.float32);
-    _mpv.setAudioChannels(Channels.stereo);
+    fixedOutput(_mpv); // sortie son fixe, voir audio_output.dart
     _mpv.setReplayGain(const ReplayGainSettings(mode: ReplayGain.track));
     _mpv.setMediaSession(const MediaSession());
     _sync = QueueSync<Track>(PlayerPort(_mpv), (t) => t.path);
