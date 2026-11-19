@@ -69,6 +69,7 @@ abstract interface class Deck {
 /// 2e lecteur mpv, créé au premier fondu.
 class MpvDeck implements Deck {
   Player? _p;
+  String? _driver; // pilote de sortie choisi pour la sortie du Mac (voir audio_output.dart)
   Player get _player => _p ??= () {
     final p = Player(
       configuration: const PlayerConfiguration(
@@ -77,6 +78,8 @@ class MpvDeck implements Deck {
       ),
     );
     fixedOutput(p); // même sortie que le lecteur principal
+    final d = _driver;
+    if (d != null) p.setAudioDriver(d);
     p.setReplayGain(const ReplayGainSettings(mode: ReplayGain.track));
     return p;
   }();
@@ -85,6 +88,12 @@ class MpvDeck implements Deck {
   Future<void> play(String path) async {
     await _player.setVolume(0);
     await _player.open(Media(path));
+  }
+
+  /// Même pilote que le lecteur principal ; le 2e lecteur n'est pas créé pour autant.
+  Future<void> setAudioDriver(String d) async {
+    _driver = d;
+    await _p?.setAudioDriver(d);
   }
 
   @override

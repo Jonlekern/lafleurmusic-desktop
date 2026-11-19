@@ -23,6 +23,7 @@ import 'library/track_ops.dart';
 import 'platform/trash.dart';
 import 'library/folders.dart';
 import 'library/scanner.dart';
+import 'player/audio_output.dart';
 import 'player/equalizer.dart';
 import 'player/loudness.dart';
 import 'repair/musicbrainz.dart';
@@ -53,6 +54,8 @@ Future<void> main() async {
   final settingsFile = File(p.join(support.path, 'settings.json'));
   final settings = await AppSettings.load(settingsFile);
   final player = LafleurPlayer();
+  // CoreAudio sur une vraie sortie, AVFoundation sur une sortie virtuelle (Jump Desktop) : voir audio_output.dart
+  await followAudioRoute(const MacAudioRoute(), player.setAudioDriver);
   await player.setEqualizer(settings.equalizer);
   await player.setCrossfade(
     settings.crossfade ? settings.crossfadeSeconds : null,

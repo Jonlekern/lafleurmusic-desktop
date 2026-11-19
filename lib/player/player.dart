@@ -530,6 +530,12 @@ class LafleurPlayer implements PlayerController {
     _emit();
   }
 
+  /// Pilote de sortie (coreaudio ou avfoundation) selon la sortie du Mac : voir audio_output.dart.
+  Future<void> setAudioDriver(String driver) async {
+    await _mpv.setAudioDriver(driver);
+    await _deck.setAudioDriver(driver);
+  }
+
   Future<void> dispose() async {
     await _fader.cancel();
     await _deck.dispose();
