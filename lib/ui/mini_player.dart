@@ -40,7 +40,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
       onKeyEvent: (_, e) {
         if (e is! KeyDownEvent) return KeyEventResult.ignored;
         if (e.logicalKey == LogicalKeyboardKey.space) {
-          player.toggle();
+          playOrShuffle(AppScope.of(context));
         } else if (e.logicalKey == LogicalKeyboardKey.arrowRight) {
           player.next();
         } else if (e.logicalKey == LogicalKeyboardKey.arrowLeft) {

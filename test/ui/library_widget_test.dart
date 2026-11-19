@@ -169,6 +169,8 @@ void main() {
     'espace : lecture / pause ; flèches : morceau suivant / précédent',
     (tester) async {
       final (_, player) = await pump(tester, demo);
+      // un morceau est déjà en cours (sinon espace lance la bibliothèque au hasard)
+      player.current = PlayerState(track: demo[0]);
       await tester.sendKeyEvent(LogicalKeyboardKey.space);
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);

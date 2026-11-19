@@ -43,6 +43,7 @@ void main() {
     Track? track,
     Widget? child,
     Widget? app,
+    List<Track> library = const [],
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -57,6 +58,9 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       await tester.runAsync(db.close);
     });
+    if (library.isNotEmpty) {
+      await tester.runAsync(() => db.upsertTracks(library));
+    }
     player = FakePlayer();
     player.current = track == null
         ? const PlayerState()
@@ -243,5 +247,65 @@ void main() {
       ),
     );
     expect(b.value, 20);
+  });
+
+  Track other(int i) => Track(
+    path: '/m/$i.flac',
+    folderId: 1,
+    title: 'T$i',
+    artist: 'A',
+    album: 'B',
+    trackNo: i,
+    durationMs: 1000,
+    hasCover: false,
+    mtime: 1,
+    size: 1,
+  );
+
+  testWidgets('rien de choisi : Lecture joue toute la bibliothèque au hasard', (
+    tester,
+  ) async {
+    final lib = [for (var i = 1; i <= 5; i++) other(i)];
+    await pump(tester, library: lib);
+    await tester.tap(find.byKey(const Key('playpause')));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 50)),
+    );
+    await tester.pump();
+    expect(player.calls, contains('play'));
+    expect(player.calls, isNot(contains('toggle')));
+    expect(player.lastShuffle, true);
+    expect(player.lastTracks?.length, 5);
+  });
+
+  testWidgets('rien de choisi : espace aussi', (tester) async {
+    await pump(tester, library: [other(1), other(2)]);
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 50)),
+    );
+    expect(player.calls, contains('play'));
+    expect(player.lastShuffle, true);
+  });
+
+  testWidgets(
+    'un morceau en cours : Lecture fait pause / lecture comme avant',
+    (tester) async {
+      await pump(tester, track: _track('Lafleur Surf'), library: [other(1)]);
+      await tester.tap(find.byKey(const Key('playpause')));
+      expect(player.calls, ['toggle']);
+    },
+  );
+
+  testWidgets('bibliothèque vide : Lecture ne fait rien, sans erreur', (
+    tester,
+  ) async {
+    await pump(tester);
+    await tester.tap(find.byKey(const Key('playpause')));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 50)),
+    );
+    expect(player.calls, isEmpty);
+    expect(tester.takeException(), isNull);
   });
 }

@@ -9,6 +9,18 @@ import 'format.dart';
 
 /// Les pièces de la barre de lecture, partagées par la barre du bas et le mini-lecteur.
 
+/// Lecture / Pause. Rien de choisi depuis l'ouverture : toute la bibliothèque, au hasard.
+Future<void> playOrShuffle(AppScope app) async {
+  final player = app.player;
+  if (player.current.track != null ||
+      (player.queue?.tracks.isNotEmpty ?? false)) {
+    return player.toggle();
+  }
+  final all = await app.db.watchAllTracks().first;
+  if (all.isEmpty) return;
+  await player.playTracks(all, 0, shuffle: true);
+}
+
 /// Aléatoire, précédent, rond rose Lecture / Pause, suivant, répéter.
 class PlaybackButtons extends StatelessWidget {
   const PlaybackButtons({super.key, required this.st});
@@ -31,7 +43,7 @@ class PlaybackButtons extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: InkWell(
             key: const Key('playpause'),
-            onTap: app.player.toggle,
+            onTap: () => playOrShuffle(app),
             customBorder: const CircleBorder(),
             child: Container(
               width: 40,

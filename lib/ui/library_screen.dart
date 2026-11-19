@@ -9,6 +9,7 @@ import '../library/models.dart';
 import '../theme/colors.dart';
 import '../theme/widgets.dart';
 import 'now_panel.dart';
+import 'player_controls.dart';
 import 'window_steps.dart';
 import 'player_bar.dart';
 import 'artist_browser.dart';
@@ -84,7 +85,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     } else if (cmd && e.logicalKey == LogicalKeyboardKey.keyF) {
       _searchFocus.requestFocus();
     } else if (e.logicalKey == LogicalKeyboardKey.space) {
-      player.toggle();
+      playOrShuffle(AppScope.of(context));
     } else if (e.logicalKey == LogicalKeyboardKey.arrowRight) {
       player.next();
     } else if (e.logicalKey == LogicalKeyboardKey.arrowLeft) {
