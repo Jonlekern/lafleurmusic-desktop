@@ -169,37 +169,44 @@ class VolumeControl extends StatefulWidget {
 }
 
 class _VolumeControlState extends State<VolumeControl> {
-  double? _volume; // lu sur le lecteur au premier dessin
+  double? _drag; // pendant qu'on tire le curseur
 
   @override
   Widget build(BuildContext context) {
     final player = AppScope.of(context).player;
-    final v = _volume ?? player.volume.clamp(0.0, 100.0);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.volume_up_rounded, size: 18, color: LafleurColors.sub),
-        SizedBox(
-          width: 90,
-          child: SliderTheme(
-            data: const SliderThemeData(
-              trackHeight: 3,
-              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6),
-              overlayShape: RoundSliderOverlayShape(overlayRadius: 10),
+    // relu à chaque changement du lecteur : la barre et le mini-lecteur montrent le même volume
+    return StreamBuilder<PlayerState>(
+      stream: player.state,
+      builder: (context, _) {
+        final v = _drag ?? player.volume.clamp(0.0, 100.0);
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.volume_up_rounded, size: 18, color: LafleurColors.sub),
+            SizedBox(
+              width: 90,
+              child: SliderTheme(
+                data: const SliderThemeData(
+                  trackHeight: 3,
+                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6),
+                  overlayShape: RoundSliderOverlayShape(overlayRadius: 10),
+                ),
+                child: Slider(
+                  value: v,
+                  max: 100,
+                  activeColor: LafleurColors.text,
+                  inactiveColor: LafleurColors.p.track,
+                  onChanged: (x) {
+                    setState(() => _drag = x);
+                    player.setVolume(x);
+                  },
+                  onChangeEnd: (_) => setState(() => _drag = null),
+                ),
+              ),
             ),
-            child: Slider(
-              value: v,
-              max: 100,
-              activeColor: LafleurColors.text,
-              inactiveColor: LafleurColors.p.track,
-              onChanged: (x) {
-                setState(() => _volume = x);
-                player.setVolume(x);
-              },
-            ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

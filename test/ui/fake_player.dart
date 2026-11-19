@@ -55,6 +55,9 @@ class FakePlayer implements PlayerController {
   Future<void> setVolume(double v) async {
     calls.add('volume');
     volume = v;
+    _state.add(
+      current,
+    ); // comme le vrai lecteur : un changement de volume se signale
   }
 
   @override

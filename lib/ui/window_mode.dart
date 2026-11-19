@@ -93,6 +93,14 @@ class SnapController with WindowListener {
   @override
   void onWindowResized() => resized();
 
+  // agrandie, rétrécie ou sortie du plein écran sans tirer le bord : même règle
+  @override
+  void onWindowMaximize() => resized();
+  @override
+  void onWindowUnmaximize() => resized();
+  @override
+  void onWindowLeaveFullScreen() => resized();
+
   Future<void> resized() async {
     if (paused()) return;
     final wasMini = _snap.mini;

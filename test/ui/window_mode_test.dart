@@ -199,5 +199,20 @@ void main() {
       await c.resized();
       expect(wm.size, const Size(1000, 700));
     });
+
+    test(
+      'agrandie (double-clic ou bouton vert) en mini : on sort du mini-lecteur',
+      () async {
+        final c = make();
+        await c.start();
+        wm.size = const Size(900, 250);
+        await c.resized();
+        wm.size = const Size(1440, 900);
+        c.onWindowMaximize();
+        await pumpEventQueue();
+        expect(wm.minimum, kMinPage);
+        expect(saved.last, isNull);
+      },
+    );
   });
 }

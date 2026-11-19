@@ -15,6 +15,7 @@ import 'package:lafleurmusic/theme/colors.dart';
 import 'package:lafleurmusic/theme/lafleur_theme.dart';
 import 'package:lafleurmusic/ui/cover_image.dart';
 import 'package:lafleurmusic/ui/mini_player.dart';
+import 'package:lafleurmusic/ui/player_controls.dart';
 
 import 'fake_player.dart';
 import 'fonts.dart';
@@ -41,6 +42,7 @@ void main() {
     Size size = const Size(480, 130),
     Track? track,
     Widget? child,
+    Widget? app,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -73,10 +75,12 @@ void main() {
           embedded: (_) async => null,
         ),
         strings: Strings.of(const Locale('fr')),
-        child: MaterialApp(
-          theme: lafleurTheme(LafleurPalette.current),
-          home: Scaffold(body: child ?? const MiniPlayer()),
-        ),
+        child:
+            app ??
+            MaterialApp(
+              theme: lafleurTheme(LafleurPalette.current),
+              home: Scaffold(body: child ?? const MiniPlayer()),
+            ),
       ),
     );
     await tester.pump();
@@ -167,5 +171,77 @@ void main() {
     );
     expect(find.text('page'), findsOneWidget);
     expect(find.byType(MiniPlayer), findsNothing);
+  });
+
+  // comme dans main.dart : le mini-lecteur est posé par MaterialApp.builder, au-dessus du Navigator
+  Widget realApp(Widget page) => MaterialApp(
+    theme: lafleurTheme(LafleurPalette.current),
+    builder: (context, child) => WindowSteps(child: child!),
+    home: Scaffold(body: page),
+  );
+
+  testWidgets('dans l\'appli (MaterialApp.builder) : le mini-lecteur marche', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      size: const Size(900, 130),
+      track: _track('Lafleur Surf'),
+      app: realApp(const Text('page')),
+    );
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.byKey(const Key('playpause')));
+    expect(player.calls, contains('toggle'));
+  });
+
+  testWidgets(
+    'recherche active puis fenêtre réduite : espace = lecture / pause',
+    (tester) async {
+      await pump(
+        tester,
+        size: const Size(900, 690),
+        track: _track('Lafleur Surf'),
+        app: realApp(const TextField(autofocus: true)),
+      );
+      await tester.pump();
+      tester.view.physicalSize = const Size(900, 130);
+      await tester.pump();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(player.calls, contains('toggle'));
+      expect(
+        tester
+            .widget<EditableText>(
+              find.byType(EditableText, skipOffstage: false),
+            )
+            .controller
+            .text,
+        isEmpty,
+      );
+    },
+  );
+
+  testWidgets('volume changé dans le mini-lecteur : la barre suit', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      track: _track('Lafleur Surf'),
+      child: const Column(
+        children: [
+          VolumeControl(key: Key('a')),
+          VolumeControl(key: Key('b')),
+        ],
+      ),
+    );
+    await player.setVolume(20);
+    await tester.pump();
+    final b = tester.widget<Slider>(
+      find.descendant(
+        of: find.byKey(const Key('b')),
+        matching: find.byType(Slider),
+      ),
+    );
+    expect(b.value, 20);
   });
 }

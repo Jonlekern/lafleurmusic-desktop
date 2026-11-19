@@ -8,14 +8,35 @@ import 'player_controls.dart';
 import 'window_steps.dart';
 
 /// Le mini-lecteur (fenêtre de moins de 300 de haut) : titre, boutons + volume, barre de temps.
-class MiniPlayer extends StatelessWidget {
+class MiniPlayer extends StatefulWidget {
   const MiniPlayer({super.key});
+  @override
+  State<MiniPlayer> createState() => _MiniPlayerState();
+}
+
+class _MiniPlayerState extends State<MiniPlayer> {
+  final _focus = FocusNode(debugLabel: 'mini');
+
+  @override
+  void initState() {
+    super.initState();
+    // le clavier vient au mini-lecteur, même si la recherche l'avait (autofocus ne suffit pas)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focus.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final player = AppScope.of(context).player;
     return Focus(
-      autofocus: true,
+      focusNode: _focus,
       onKeyEvent: (_, e) {
         if (e is! KeyDownEvent) return KeyEventResult.ignored;
         if (e.logicalKey == LogicalKeyboardKey.space) {
@@ -29,48 +50,49 @@ class MiniPlayer extends StatelessWidget {
         }
         return KeyEventResult.handled;
       },
-      child: Container(
+      // posé au-dessus du Navigator (MaterialApp.builder) : il lui faut son propre Material
+      child: Material(
         color: LafleurColors.bar,
-        width: double.infinity,
-        height: double.infinity,
-        child: StreamBuilder<PlayerState>(
-          stream: player.state,
-          initialData: player.current,
-          builder: (context, snap) {
-            final st = snap.data ?? const PlayerState();
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 18,
-                    child: Text(
-                      st.track?.title ?? '',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
+        child: SizedBox.expand(
+          child: StreamBuilder<PlayerState>(
+            stream: player.state,
+            initialData: player.current,
+            builder: (context, snap) {
+              final st = snap.data ?? const PlayerState();
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 18,
+                      child: Text(
+                        st.track?.title ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
-                  ),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        PlaybackButtons(st: st),
-                        const SizedBox(width: 12),
-                        const VolumeControl(),
-                      ],
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PlaybackButtons(st: st),
+                          const SizedBox(width: 12),
+                          const VolumeControl(),
+                        ],
+                      ),
                     ),
-                  ),
-                  ProgressRow(st: st, width: 380),
-                ],
-              ),
-            );
-          },
+                    ProgressRow(st: st, width: 380),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -86,15 +108,25 @@ class WindowSteps extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (off?.call() == true ||
-        stepFor(MediaQuery.sizeOf(context)) != WindowStep.mini) {
-      return child;
-    }
+    final mini =
+        off?.call() != true &&
+        stepFor(MediaQuery.sizeOf(context)) == WindowStep.mini;
+    // même arbre dans les deux cas : la page garde son état ; cachée, elle ne prend plus le clavier
     return Stack(
       fit: StackFit.expand,
       children: [
-        Offstage(child: child),
-        const Positioned.fill(child: MiniPlayer()),
+        Offstage(
+          offstage: mini,
+          child: ExcludeFocus(
+            excluding: mini,
+            child: TickerMode(enabled: !mini, child: child),
+          ),
+        ),
+        if (mini)
+          // au-dessus du Navigator : une Overlay pour le curseur de volume
+          Overlay(
+            initialEntries: [OverlayEntry(builder: (_) => const MiniPlayer())],
+          ),
       ],
     );
   }
