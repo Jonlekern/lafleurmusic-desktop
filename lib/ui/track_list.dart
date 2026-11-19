@@ -228,7 +228,10 @@ class TrackList extends StatelessWidget {
                               app.player.playTracks(tracks, i);
                             },
                     );
-                    final menu = TrackMenuArea(track: t, child: row);
+                    final menu = SwipeToPlayNext(
+                      track: t,
+                      child: TrackMenuArea(track: t, child: row),
+                    );
                     if (app.writer == null || t.missing) return menu;
                     // glisser un morceau : sur une autre ligne (réordonner) ou sur une playlist de la barre latérale
                     final draggable = Draggable<Track>(

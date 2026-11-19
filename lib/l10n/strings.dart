@@ -134,6 +134,7 @@ class Strings {
 
   // plan 5 : menu d'un morceau, Supprimer, Remplacer, Modifier
   String get playNextAction => _t('Lire ensuite', 'Play next');
+  String get swipePlayNext => '← $playNextAction';
   String get addToQueue => _t('Ajouter à la file', 'Add to queue');
   String get editTrack => _t('Modifier…', 'Edit…');
   String get replaceWith => _t('Remplacer par…', 'Replace with…');

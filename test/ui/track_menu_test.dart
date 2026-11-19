@@ -298,4 +298,52 @@ void main() {
     expect(player.calls, ['enqueue']);
     expect(player.lastAdded!.length, 9);
   });
+
+  group('deux doigts vers la gauche (trackpad) → Lire ensuite', () {
+    Future<void> swipe(WidgetTester tester, String text, Offset pan) async {
+      final p = TestPointer(9, PointerDeviceKind.trackpad);
+      final at = tester.getCenter(find.text(text));
+      await tester.sendEventToBinding(p.panZoomStart(at));
+      for (var i = 1; i <= 10; i++) {
+        await tester.sendEventToBinding(
+          p.panZoomUpdate(at, pan: pan * (i / 10)),
+        );
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await tester.sendEventToBinding(p.panZoomEnd());
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('assez loin : le morceau passe en Lire ensuite', (
+      tester,
+    ) async {
+      await pump(tester);
+      final p = TestPointer(9, PointerDeviceKind.trackpad);
+      final at = tester.getCenter(find.text('Sunset Tape'));
+      await tester.sendEventToBinding(p.panZoomStart(at));
+      await tester.sendEventToBinding(
+        p.panZoomUpdate(at, pan: const Offset(-120, 0)),
+      );
+      await tester.pump();
+      expect(find.text('← Lire ensuite'), findsOneWidget); // le bandeau rose
+      await tester.sendEventToBinding(p.panZoomEnd());
+      await tester.pumpAndSettle();
+      expect(player.calls, ['playNext']);
+      expect(player.lastAdded!.single.title, 'Sunset Tape');
+      expect(find.text('← Lire ensuite'), findsNothing); // la ligne revient
+    });
+
+    testWidgets('trop court : rien', (tester) async {
+      await pump(tester);
+      await swipe(tester, 'Sunset Tape', const Offset(-40, 0));
+      expect(player.calls, isEmpty);
+    });
+
+    testWidgets('défilement vertical ou vers la droite : rien', (tester) async {
+      await pump(tester);
+      await swipe(tester, 'Sunset Tape', const Offset(-20, -200));
+      await swipe(tester, 'Sunset Tape', const Offset(150, 0));
+      expect(player.calls, isEmpty);
+    });
+  });
 }
