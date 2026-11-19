@@ -50,6 +50,7 @@ class FakePlayer implements PlayerController {
     calls.add('seek');
     lastSeek = d;
   }
+
   @override
   Future<void> setVolume(double v) async {
     calls.add('volume');

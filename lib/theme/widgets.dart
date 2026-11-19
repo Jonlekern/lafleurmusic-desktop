@@ -93,30 +93,46 @@ class TitleBar extends StatelessWidget {
   final Widget? trailing;
 
   @override
-  Widget build(BuildContext context) => Container(
-    height: 52,
-    width: double.infinity,
-    decoration: BoxDecoration(
-      color: LafleurColors.bar,
-      border: Border(bottom: BorderSide(color: LafleurColors.line)),
-    ),
-    padding: const EdgeInsets.symmetric(horizontal: 18),
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        Image.asset(
-          'assets/logo-texte-grand.png',
-          height: 20,
-          // logo blanc la nuit, noir le jour
-          color: LafleurColors.p.brightness == Brightness.light
-              ? LafleurColors.text
-              : null,
-        ),
-        if (trailing != null)
-          Align(alignment: Alignment.centerRight, child: trailing),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    // fenêtre étroite (taille moyenne) : logo plus petit, centré dans la place laissée par la recherche
+    final narrow = MediaQuery.sizeOf(context).width < 880;
+    final logo = Image.asset(
+      'assets/logo-texte-grand.png',
+      height: narrow ? 16 : 20,
+      // logo blanc la nuit, noir le jour
+      color: LafleurColors.p.brightness == Brightness.light
+          ? LafleurColors.text
+          : null,
+    );
+    return Container(
+      height: 52,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: LafleurColors.bar,
+        border: Border(bottom: BorderSide(color: LafleurColors.line)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: narrow
+          ? Row(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: FittedBox(fit: BoxFit.scaleDown, child: logo),
+                  ),
+                ),
+                if (trailing != null) ...[const SizedBox(width: 12), trailing!],
+              ],
+            )
+          : Stack(
+              alignment: Alignment.center,
+              children: [
+                logo,
+                if (trailing != null)
+                  Align(alignment: Alignment.centerRight, child: trailing),
+              ],
+            ),
+    );
+  }
 }
 
 /// Contour en pointillés arrondi (zone de dépôt de la maquette 1).

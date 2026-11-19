@@ -14,7 +14,10 @@ import 'package:lafleurmusic/player/player.dart';
 import 'package:lafleurmusic/tags/tag_writer.dart';
 import 'package:lafleurmusic/theme/colors.dart';
 import 'package:lafleurmusic/theme/lafleur_theme.dart';
+import 'package:lafleurmusic/ui/cover_image.dart';
 import 'package:lafleurmusic/ui/library_screen.dart';
+import 'package:lafleurmusic/ui/now_panel.dart';
+import 'package:lafleurmusic/ui/player_bar.dart';
 import 'package:lafleurmusic/ui/track_list.dart';
 
 import '../tags/fake_io.dart';
@@ -469,4 +472,90 @@ void main() {
     await pump(tester, demo);
     expect(inList('ALBUM'), findsOneWidget);
   });
+
+  Future<void> playing(WidgetTester tester, FakePlayer player) async {
+    player.queue = null;
+    await player.playTracks(demo, 1);
+    player.show(
+      PlayerState(
+        track: demo[1],
+        position: const Duration(seconds: 93),
+        duration: const Duration(seconds: 245),
+        playing: true,
+      ),
+    );
+    await tester.pump();
+  }
+
+  Future<void> resize(WidgetTester tester, Size s) async {
+    tester.view.physicalSize = s;
+    await tester.pump();
+  }
+
+  testWidgets(
+    'taille moyenne : sans « En cours », titre au-dessus de la barre de temps',
+    (tester) async {
+      final (_, player) = await pump(tester, demo);
+      await playing(tester, player);
+      await resize(tester, const Size(860, 690));
+      expect(find.byType(NowPanel), findsNothing);
+      final bar = find.byType(PlayerBar);
+      final title = find.descendant(
+        of: bar,
+        matching: find.text('Lafleur Surf'),
+      );
+      expect(title, findsOneWidget);
+      expect(
+        tester.getCenter(title).dy,
+        lessThan(tester.getCenter(find.byKey(const Key('progress'))).dy),
+      );
+      expect(
+        find.descendant(of: bar, matching: find.byType(CoverImage)),
+        findsNothing,
+      );
+      expect(find.text('EQ'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('grande taille (920) : « En cours » toujours là', (tester) async {
+    final (_, player) = await pump(tester, demo);
+    await playing(tester, player);
+    await resize(tester, const Size(920, 690));
+    expect(find.byType(NowPanel), findsOneWidget);
+  });
+
+  testWidgets('taille moyenne la plus étroite (560) : rien ne déborde', (
+    tester,
+  ) async {
+    final (_, player) = await pump(tester, demo);
+    await playing(tester, player);
+    await resize(tester, const Size(560, 690));
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const Key('playpause')), findsOneWidget);
+    expect(find.text('EQ'), findsOneWidget);
+  });
+
+  for (final day in [false, true]) {
+    testWidgets('image : taille moyenne ${day ? 'jour' : 'nuit'}', (
+      tester,
+    ) async {
+      if (day) {
+        LafleurPalette.current = LafleurPalette.day;
+        addTearDown(() => LafleurPalette.current = LafleurPalette.night);
+      }
+      final (_, player) = await pump(tester, demo);
+      await playing(tester, player);
+      await resize(tester, const Size(860, 690));
+      await precacheAssets(tester, [
+        'assets/fleur-tile.png',
+        'assets/fleur.png',
+        'assets/logo-texte-grand.png',
+      ]);
+      await expectLater(
+        find.byType(LibraryScreen),
+        matchesGoldenFile('goldens/2c-moyenne${day ? '-jour' : ''}.png'),
+      );
+    });
+  }
 }

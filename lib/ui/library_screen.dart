@@ -9,6 +9,7 @@ import '../library/models.dart';
 import '../theme/colors.dart';
 import '../theme/widgets.dart';
 import 'now_panel.dart';
+import 'window_steps.dart';
 import 'player_bar.dart';
 import 'artist_browser.dart';
 import 'artist_photo_drop.dart';
@@ -167,7 +168,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
           children: [
             TitleBar(
               trailing: SizedBox(
-                width: 260,
+                width: stepFor(MediaQuery.sizeOf(context)) == WindowStep.large
+                    ? 260
+                    : 180,
                 height: 30,
                 child: TextField(
                   key: const Key('search'),
@@ -304,11 +307,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             ),
                           ),
                   ),
-                  NowPanel(
-                    extra: _artistPage && _query.trim().isEmpty
-                        ? ArtistSummary(name: _name!)
-                        : null,
-                  ),
+                  // moins large que 880 : la colonne « En cours » part (taille moyenne)
+                  if (stepFor(MediaQuery.sizeOf(context)) == WindowStep.large)
+                    NowPanel(
+                      extra: _artistPage && _query.trim().isEmpty
+                          ? ArtistSummary(name: _name!)
+                          : null,
+                    ),
                 ],
               ),
             ),

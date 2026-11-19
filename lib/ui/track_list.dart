@@ -50,122 +50,132 @@ class TrackList extends StatelessWidget {
           if (showHeader)
             Padding(
               padding: const EdgeInsets.only(bottom: 26),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: LafleurColors.p.shadow,
-                          blurRadius: 40,
-                          offset: Offset(0, 12),
-                        ),
-                      ],
-                      shape: headerImage != null
-                          ? BoxShape.circle
-                          : BoxShape.rectangle,
-                      borderRadius: headerImage != null
-                          ? null
-                          : BorderRadius.circular(6),
-                    ),
-                    child: CoverDrop(
-                      tracks: renamable ? tracks : const [],
-                      // un album : sa pochette ; une autre liste (Morceaux, Artiste…) : mosaïque de ses albums
-                      child: headerImage != null
-                          ? headerImage!
-                          : renamable
-                          ? CoverImage(
-                              trackPath: tracks.isEmpty
-                                  ? null
-                                  : tracks.first.path,
-                              size: 190,
-                              radius: 6,
-                            )
-                          : CoverMosaic(tracks: tracks, size: 190),
-                    ),
-                  ),
-                  const SizedBox(width: 26),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          label ?? s.playlistLabel,
-                          style: TextStyle(
-                            color: LafleurColors.sub,
-                            fontSize: 12,
-                            letterSpacing: 1,
-                            fontWeight: FontWeight.w700,
+              // liste étroite : pas de grande pochette, le titre et les boutons ont la place
+              child: LayoutBuilder(
+                builder: (context, box) {
+                  final cover = box.maxWidth >= 520;
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (cover)
+                        Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: LafleurColors.p.shadow,
+                                blurRadius: 40,
+                                offset: Offset(0, 12),
+                              ),
+                            ],
+                            shape: headerImage != null
+                                ? BoxShape.circle
+                                : BoxShape.rectangle,
+                            borderRadius: headerImage != null
+                                ? null
+                                : BorderRadius.circular(6),
+                          ),
+                          child: CoverDrop(
+                            tracks: renamable ? tracks : const [],
+                            // un album : sa pochette ; une autre liste (Morceaux, Artiste…) : mosaïque de ses albums
+                            child: headerImage != null
+                                ? headerImage!
+                                : renamable
+                                ? CoverImage(
+                                    trackPath: tracks.isEmpty
+                                        ? null
+                                        : tracks.first.path,
+                                    size: 190,
+                                    radius: 6,
+                                  )
+                                : CoverMosaic(tracks: tracks, size: 190),
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        EditableTitle(
-                          text: title,
-                          // renommer = changer l'album de tous les morceaux (seulement pour une vraie playlist)
-                          onRename: app.writer == null || !renamable
-                              ? null
-                              : (v) => writeEdits(context, [
-                                  for (final t in tracks)
-                                    TagEdit(path: t.path, album: v),
-                                ]),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${s.nSongs(tracks.length)} · ${s.minutes(minutes)}',
-                          style: TextStyle(
-                            color: LafleurColors.sub,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        Row(
+                      if (cover) const SizedBox(width: 26),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            PillButton(
-                              label: s.play,
-                              icon: Icons.play_arrow_rounded,
-                              primary: true,
-                              onPressed: tracks.isEmpty
-                                  ? null
-                                  : () => app.player.playTracks(tracks, 0),
+                            Text(
+                              label ?? s.playlistLabel,
+                              style: TextStyle(
+                                color: LafleurColors.sub,
+                                fontSize: 12,
+                                letterSpacing: 1,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                            const SizedBox(width: 12),
-                            PillButton(
-                              label: s.shuffle,
-                              icon: Icons.shuffle_rounded,
-                              onPressed: tracks.isEmpty
+                            const SizedBox(height: 6),
+                            EditableTitle(
+                              text: title,
+                              // renommer = changer l'album de tous les morceaux (seulement pour une vraie playlist)
+                              onRename: app.writer == null || !renamable
                                   ? null
-                                  : () => app.player.playTracks(
-                                      tracks,
-                                      0,
-                                      shuffle: true,
-                                    ),
+                                  : (v) => writeEdits(context, [
+                                      for (final t in tracks)
+                                        TagEdit(path: t.path, album: v),
+                                    ]),
                             ),
-                            const SizedBox(width: 12),
-                            PillButton(
-                              label: s.repair,
-                              icon: Icons.auto_fix_high_rounded,
-                              onPressed:
-                                  tracks.isEmpty ||
-                                      app.writer == null ||
-                                      app.musicbrainz == null
-                                  ? null
-                                  : () => openRepair(
-                                      context,
-                                      tracks
-                                          .where(
-                                            (t) =>
-                                                t.album == tracks.first.album,
-                                          )
-                                          .toList(),
-                                    ),
-                            ), // plan 3
+                            const SizedBox(height: 6),
+                            Text(
+                              '${s.nSongs(tracks.length)} · ${s.minutes(minutes)}',
+                              style: TextStyle(
+                                color: LafleurColors.sub,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            // fenêtre étroite : les boutons passent à la ligne
+                            Wrap(
+                              spacing: 12,
+                              runSpacing: 10,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                PillButton(
+                                  label: s.play,
+                                  icon: Icons.play_arrow_rounded,
+                                  primary: true,
+                                  onPressed: tracks.isEmpty
+                                      ? null
+                                      : () => app.player.playTracks(tracks, 0),
+                                ),
+                                PillButton(
+                                  label: s.shuffle,
+                                  icon: Icons.shuffle_rounded,
+                                  onPressed: tracks.isEmpty
+                                      ? null
+                                      : () => app.player.playTracks(
+                                          tracks,
+                                          0,
+                                          shuffle: true,
+                                        ),
+                                ),
+                                PillButton(
+                                  label: s.repair,
+                                  icon: Icons.auto_fix_high_rounded,
+                                  onPressed:
+                                      tracks.isEmpty ||
+                                          app.writer == null ||
+                                          app.musicbrainz == null
+                                      ? null
+                                      : () => openRepair(
+                                          context,
+                                          tracks
+                                              .where(
+                                                (t) =>
+                                                    t.album ==
+                                                    tracks.first.album,
+                                              )
+                                              .toList(),
+                                        ),
+                                ), // plan 3
+                              ],
+                            ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           _Row(
@@ -405,29 +415,41 @@ class _RowState extends State<_Row> {
                 ? Border(bottom: BorderSide(color: LafleurColors.line))
                 : null,
           ),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 40,
-                child: Text(
-                  w.no,
-                  style: st(false).copyWith(color: fg.withValues(alpha: 0.75)),
-                ),
-              ),
-              Expanded(child: _cell(EditField.title, w.title, st(true))),
-              const SizedBox(width: 12),
-              SizedBox(
-                width: 260,
-                child: _cell(EditField.artist, w.artist, st(false)),
-              ),
-              SizedBox(
-                width: 70,
-                child: Text(
-                  w.time,
-                  style: st(false).copyWith(color: fg.withValues(alpha: 0.75)),
-                ),
-              ),
-            ],
+          child: LayoutBuilder(
+            builder: (_, c) {
+              // le titre garde au moins 200 ; l'artiste prend jusqu'à 260, disparaît s'il reste trop peu
+              final artist = (c.maxWidth - 40 - 12 - 70 - 200).clamp(
+                0.0,
+                260.0,
+              );
+              return Row(
+                children: [
+                  SizedBox(
+                    width: 40,
+                    child: Text(
+                      w.no,
+                      style: st(false)
+                          .copyWith(color: fg.withValues(alpha: 0.75)),
+                    ),
+                  ),
+                  Expanded(child: _cell(EditField.title, w.title, st(true))),
+                  const SizedBox(width: 12),
+                  if (artist >= 80)
+                    SizedBox(
+                      width: artist,
+                      child: _cell(EditField.artist, w.artist, st(false)),
+                    ),
+                  SizedBox(
+                    width: 70,
+                    child: Text(
+                      w.time,
+                      style: st(false)
+                          .copyWith(color: fg.withValues(alpha: 0.75)),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
