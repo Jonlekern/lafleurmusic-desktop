@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../app_scope.dart';
 import '../library/models.dart';
 import '../theme/colors.dart';
+import '../theme/lafleur_theme.dart';
 import '../theme/widgets.dart';
 import 'cover_image.dart';
 import 'coverflow_layout.dart';
@@ -135,126 +136,131 @@ class _CoverflowScreenState extends State<CoverflowScreen>
     final cover = (size.height * 0.44).clamp(180.0, 400.0);
     final k = cover / 400;
     final album = _count == 0 ? null : widget.albums[_current];
+    // fond toujours noir, même le jour : textes et boutons en couleurs de nuit
     return Focus(
       autofocus: true,
       onKeyEvent: _onKey,
-      child: Scaffold(
-        body: Listener(
-          onPointerSignal: (e) {
-            if (e is PointerScrollEvent) {
-              _onWheel(
-                e.scrollDelta.dx.abs() > e.scrollDelta.dy.abs()
-                    ? e.scrollDelta.dx
-                    : e.scrollDelta.dy,
-              );
-            }
-          },
-          onPointerPanZoomUpdate: (e) => _scrollBy(
-            -(e.panDelta.dx.abs() >= e.panDelta.dy.abs()
-                    ? e.panDelta.dx
-                    : e.panDelta.dy) /
-                (180 * k),
-          ),
-          onPointerPanZoomEnd: (_) => _endScroll(),
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(0, -0.2),
-                radius: 0.9,
-                colors: [Color(0xFF1D1D1D), Color(0xFF050505)],
-              ),
+      child: Theme(
+        data: lafleurTheme(),
+        child: Scaffold(
+          body: Listener(
+            onPointerSignal: (e) {
+              if (e is PointerScrollEvent) {
+                _onWheel(
+                  e.scrollDelta.dx.abs() > e.scrollDelta.dy.abs()
+                      ? e.scrollDelta.dx
+                      : e.scrollDelta.dy,
+                );
+              }
+            },
+            onPointerPanZoomUpdate: (e) => _scrollBy(
+              -(e.panDelta.dx.abs() >= e.panDelta.dy.abs()
+                      ? e.panDelta.dx
+                      : e.panDelta.dy) /
+                  (180 * k),
             ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 28,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/logo-texte-grand.png',
-                      height: 22,
-                    ),
-                  ),
+            onPointerPanZoomEnd: (_) => _endScroll(),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment(0, -0.2),
+                  radius: 0.9,
+                  colors: [Color(0xFF1D1D1D), Color(0xFF050505)],
                 ),
-                Positioned(
-                  top: 30,
-                  right: 30,
-                  child: Text(
-                    s.escToQuit,
-                    style: TextStyle(
-                      color: LafleurPalette.night.sub,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: size.height * 0.17,
-                  left: 0,
-                  right: 0,
-                  height: cover * 1.5,
-                  child: Stack(
-                    alignment: Alignment.topCenter,
-                    children: [
-                      for (final i in drawOrder(_pos, _count))
-                        _cover(i, cover, k),
-                    ],
-                  ),
-                ),
-                if (album != null)
+              ),
+              child: Stack(
+                children: [
                   Positioned(
-                    top: size.height * 0.17 + cover * 1.35,
+                    top: 28,
                     left: 0,
                     right: 0,
-                    child: Column(
+                    child: Center(
+                      child: Image.asset(
+                        'assets/logo-texte-grand.png',
+                        height: 22,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 30,
+                    right: 30,
+                    child: Text(
+                      s.escToQuit,
+                      style: TextStyle(
+                        color: LafleurPalette.night.sub,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: size.height * 0.17,
+                    left: 0,
+                    right: 0,
+                    height: cover * 1.5,
+                    child: Stack(
+                      alignment: Alignment.topCenter,
                       children: [
-                        Text(
-                          album.name.isEmpty ? s.unknownArtist : album.name,
-                          style: const TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          s.playlistN(album.trackCount),
-                          style: TextStyle(
-                            color: LafleurPalette.night.sub,
-                            fontSize: 17,
-                          ),
-                        ),
-                        const SizedBox(height: 22),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PillButton(
-                              label: s.play,
-                              icon: Icons.play_arrow_rounded,
-                              primary: true,
-                              onPressed: _play,
-                            ),
-                            const SizedBox(width: 12),
-                            PillButton(
-                              label: s.openPlaylist,
-                              onPressed: () {
-                                widget.onOpen?.call(album.name);
-                                Navigator.of(context).maybePop();
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 26),
-                        Text(
-                          s.coverFlowHelp,
-                          style: const TextStyle(
-                            color: Color(0xFF666666),
-                            fontSize: 13,
-                          ),
-                        ),
+                        for (final i in drawOrder(_pos, _count))
+                          _cover(i, cover, k),
                       ],
                     ),
                   ),
-              ],
+                  if (album != null)
+                    Positioned(
+                      top: size.height * 0.17 + cover * 1.35,
+                      left: 0,
+                      right: 0,
+                      child: Column(
+                        children: [
+                          Text(
+                            album.name.isEmpty ? s.unknownArtist : album.name,
+                            style: const TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            s.playlistN(album.trackCount),
+                            style: TextStyle(
+                              color: LafleurPalette.night.sub,
+                              fontSize: 17,
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PillButton(
+                                label: s.play,
+                                icon: Icons.play_arrow_rounded,
+                                primary: true,
+                                onPressed: _play,
+                              ),
+                              const SizedBox(width: 12),
+                              PillButton(
+                                palette: LafleurPalette.night,
+                                label: s.openPlaylist,
+                                onPressed: () {
+                                  widget.onOpen?.call(album.name);
+                                  Navigator.of(context).maybePop();
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 26),
+                          Text(
+                            s.coverFlowHelp,
+                            style: const TextStyle(
+                              color: Color(0xFF666666),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

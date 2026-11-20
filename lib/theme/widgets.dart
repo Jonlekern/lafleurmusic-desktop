@@ -10,15 +10,19 @@ class PillButton extends StatelessWidget {
     this.icon,
     this.primary = false,
     this.onPressed,
+    this.palette,
   });
   final String label;
   final IconData? icon;
   final bool primary;
   final VoidCallback? onPressed;
+  final LafleurPalette?
+  palette; // écran toujours noir (Cover Flow) : la palette de nuit
 
   @override
   Widget build(BuildContext context) {
-    final fg = primary ? LafleurColors.ink : LafleurColors.text;
+    final p = palette ?? LafleurColors.p;
+    final fg = primary ? LafleurColors.ink : p.text;
     return Opacity(
       opacity: onPressed == null ? 0.4 : 1,
       child: InkWell(
@@ -28,7 +32,7 @@ class PillButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             color: primary ? LafleurColors.pink : null,
-            border: primary ? null : Border.all(color: LafleurColors.p.outline),
+            border: primary ? null : Border.all(color: p.outline),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(

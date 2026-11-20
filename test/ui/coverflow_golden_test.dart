@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
@@ -12,6 +13,7 @@ import 'package:lafleurmusic/l10n/strings.dart';
 import 'package:lafleurmusic/library/covers.dart';
 import 'package:lafleurmusic/library/db.dart';
 import 'package:lafleurmusic/library/models.dart';
+import 'package:lafleurmusic/theme/colors.dart';
 import 'package:lafleurmusic/theme/lafleur_theme.dart';
 import 'package:lafleurmusic/ui/cover_image.dart';
 import 'package:lafleurmusic/ui/coverflow_screen.dart';
@@ -38,8 +40,14 @@ final names = [
   'Palm',
 ];
 
-Future<FakePlayer> pump(WidgetTester tester, {int count = 7}) async {
+Future<FakePlayer> pump(
+  WidgetTester tester, {
+  int count = 7,
+  LafleurPalette palette = LafleurPalette.night,
+}) async {
   desktopSize(tester);
+  LafleurPalette.current = palette;
+  addTearDown(() => LafleurPalette.current = LafleurPalette.night);
   final db = LibraryDb(
     DatabaseConnection(
       NativeDatabase.memory(),
@@ -95,7 +103,7 @@ Future<FakePlayer> pump(WidgetTester tester, {int count = 7}) async {
       covers: covers,
       strings: Strings.of(const Locale('fr')),
       child: MaterialApp(
-        theme: lafleurTheme(),
+        theme: lafleurTheme(palette),
         home: CoverflowScreen(albums: albums, initial: count > 3 ? 3 : 0),
       ),
     ),
@@ -121,6 +129,21 @@ void main() {
       matchesGoldenFile('goldens/3-coverflow.png'),
     );
   });
+
+  testWidgets(
+    'mode clair : le Cover Flow reste noir, ses textes restent clairs',
+    (tester) async {
+      await pump(tester, palette: LafleurPalette.day);
+      Color colorOf(String text) => tester
+          .renderObject<RenderParagraph>(find.text(text))
+          .text
+          .style!
+          .color!;
+      final night = LafleurPalette.night.text;
+      expect(colorOf('Ouvrir l’album'), night);
+      expect(colorOf('Studio Lafleur').computeLuminance(), greaterThan(0.6));
+    },
+  );
 
   testWidgets('flèche droite : album suivant', (tester) async {
     await pump(tester);
